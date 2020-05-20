@@ -252,8 +252,10 @@ void LArPandoraInput::CreatePandoraDetectorGaps(const Settings &settings, const 
     }
 
     //Create CRP gaps for DP
+    art::ServiceHandle<geo::Geometry const> theGeometry;
     const bool isDualPhase(theGeometry->MaxPlanes() == 2);
-    if(!isDualPhase) return;
+    const int nCRPs(theGeometry->NTPC());
+    if(!isDualPhase || nCRPs!=4) return; //only add CRP gaps if ProtoDUNE DP
 
     const double crpGapLowerZ_y(-0.64875), crpGapUpperZ_y(0.66375);
     const double crpGapLowerZ_z(299.851), crpGapUpperZ_z(301.164);
