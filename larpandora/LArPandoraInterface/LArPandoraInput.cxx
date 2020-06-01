@@ -260,49 +260,56 @@ void LArPandoraInput::CreatePandoraDetectorGaps(const Settings &settings, const 
     const double crpGapLowerZ_y(-0.64875), crpGapUpperZ_y(0.66375);
     const double crpGapLowerZ_z(299.851), crpGapUpperZ_z(301.164);
 
-    PandoraApi::Geometry::LineGap::Parameters parameters;
-    try
+    for (const LArDriftVolume &driftVolume : driftVolumeList)
     {
-      parameters.m_lineGapType = pandora::TPC_WIRE_GAP_VIEW_U;
-      parameters.m_lineStartX = -std::numeric_limits<float>::max();
-      parameters.m_lineEndX = std::numeric_limits<float>::max();
-      parameters.m_lineStartZ = crpGapLowerZ_z;
-      parameters.m_lineEndZ = crpGapUpperZ_z;
-    }
-    catch (const pandora::StatusCodeException &)
-    {
-      mf::LogWarning("LArPandora") << "CreatePandoraDetectorGaps - invalid line gap parameter provided, all assigned values must be finite, line gap omitted " << std::endl;
-    }
-    try
-    {
-      PANDORA_THROW_RESULT_IF(pandora::STATUS_CODE_SUCCESS, !=, PandoraApi::Geometry::LineGap::Create(*pPandora, parameters));
-    }
-    catch (const pandora::StatusCodeException &)
-    {
-      mf::LogWarning("LArPandora") << "CreatePandoraDetectorGaps - unable to create line gap, insufficient or invalid information supplied " << std::endl;
-    }
 
-    try
-    {
-      parameters.m_lineGapType = pandora::TPC_WIRE_GAP_VIEW_V;
-      parameters.m_lineStartX = -std::numeric_limits<float>::max();
-      parameters.m_lineEndX = std::numeric_limits<float>::max();
-      parameters.m_lineStartZ = crpGapLowerZ_y;
-      parameters.m_lineEndZ = crpGapUpperZ_y;
-    }
-    catch (const pandora::StatusCodeException &)
-    {
-      mf::LogWarning("LArPandora") << "CreatePandoraDetectorGaps - invalid line gap parameter provided, all assigned values must be finite, line gap omitted " << std::endl;
-    }
-    try
-    {
-      PANDORA_THROW_RESULT_IF(pandora::STATUS_CODE_SUCCESS, !=, PandoraApi::Geometry::LineGap::Create(*pPandora, parameters));
-    }
-    catch (const pandora::StatusCodeException &)
-    {
-      mf::LogWarning("LArPandora") << "CreatePandoraDetectorGaps - unable to create line gap, insufficient or invalid information supplied " << std::endl;
-    }
+	    PandoraApi::Geometry::LineGap::Parameters parameters;
+	    try
+	    {
+	      parameters.m_lineGapType = pandora::TPC_WIRE_GAP_VIEW_U;
+	      //parameters.m_lineStartX = -std::numeric_limits<float>::max();
+	      //parameters.m_lineEndX = std::numeric_limits<float>::max();
+	      parameters.m_lineStartX = driftVolume.GetCenterX() - 0.5f * driftVolume.GetWidthX();
+	      parameters.m_lineEndX = driftVolume.GetCenterX() + 0.5f * driftVolume.GetWidthX();
+	      parameters.m_lineStartZ = crpGapLowerZ_z;
+	      parameters.m_lineEndZ = crpGapUpperZ_z;
+	    }
+	    catch (const pandora::StatusCodeException &)
+	    {
+	      mf::LogWarning("LArPandora") << "CreatePandoraDetectorGaps - invalid line gap parameter provided, all assigned values must be finite, line gap omitted " << std::endl;
+	    }
+	    try
+	    {
+	      PANDORA_THROW_RESULT_IF(pandora::STATUS_CODE_SUCCESS, !=, PandoraApi::Geometry::LineGap::Create(*pPandora, parameters));
+	    }
+	    catch (const pandora::StatusCodeException &)
+	    {
+	      mf::LogWarning("LArPandora") << "CreatePandoraDetectorGaps - unable to create line gap, insufficient or invalid information supplied " << std::endl;
+	    }
 
+	    try
+	    {
+	      parameters.m_lineGapType = pandora::TPC_WIRE_GAP_VIEW_V;
+	      //parameters.m_lineStartX = -std::numeric_limits<float>::max();
+	      //parameters.m_lineEndX = std::numeric_limits<float>::max();
+	      parameters.m_lineStartX = driftVolume.GetCenterX() - 0.5f * driftVolume.GetWidthX();
+	      parameters.m_lineEndX = driftVolume.GetCenterX() + 0.5f * driftVolume.GetWidthX();
+	      parameters.m_lineStartZ = crpGapLowerZ_y;
+	      parameters.m_lineEndZ = crpGapUpperZ_y;
+	    }
+	    catch (const pandora::StatusCodeException &)
+	    {
+	      mf::LogWarning("LArPandora") << "CreatePandoraDetectorGaps - invalid line gap parameter provided, all assigned values must be finite, line gap omitted " << std::endl;
+	    }
+	    try
+	    {
+	      PANDORA_THROW_RESULT_IF(pandora::STATUS_CODE_SUCCESS, !=, PandoraApi::Geometry::LineGap::Create(*pPandora, parameters));
+	    }
+	    catch (const pandora::StatusCodeException &)
+	    {
+	      mf::LogWarning("LArPandora") << "CreatePandoraDetectorGaps - unable to create line gap, insufficient or invalid information supplied " << std::endl;
+	    }
+       }
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
