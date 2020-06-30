@@ -215,17 +215,53 @@ void LArPandoraInput::CreatePandoraLArTPCs(const Settings &settings, const LArDr
 
 void LArPandoraInput::CreatePandoraDetectorGaps(const Settings &settings, const LArDriftVolumeList &driftVolumeList, const LArDetectorGapList &listOfGaps)
 {
+    //ATTN - Unlike SP, DP detector gaps are not in the drift direction 
+    art::ServiceHandle<geo::Geometry const> theGeometry;
+    const bool isDualPhase(theGeometry->MaxPlanes() == 2);
+    
     mf::LogDebug("LArPandora") << " *** LArPandoraInput::CreatePandoraDetectorGaps(...) *** " << std::endl;
-
+    
     if (!settings.m_pPrimaryPandora)
         throw cet::exception("LArPandora") << "CreatePandoraDetectorGaps - primary Pandora instance does not exist ";
-
+    
     const pandora::Pandora *pPandora(settings.m_pPrimaryPandora);
-
+    
     for (const LArDetectorGap &gap : listOfGaps)
     {
         PandoraApi::Geometry::LineGap::Parameters parameters;
-
+        
+        if (isDualPhase)
+        {
+            const float gapSizeY (std::fabs(gap.GetY2() - gap.GetY1())); //Could have chosen Z here, resulting in switching Y<->Z and U<->V in the try{...} block below
+            
+            const float maxGapSize (30.); //Match the maxDisplacement variable hard-coded value in LArPandoraGeometry
+             
+            try
+            {
+                parameters.m_lineGapType = ((gapSizeY > maxGapSize) ? pandora::TPC_WIRE_GAP_VIEW_U : pandora::TPC_WIRE_GAP_VIEW_V); //If gapSizeY is too large then the gap is in Z, therefore should be in kU (i.e. kZ)
+                parameters.m_lineStartX = gap.GetX2();
+                parameters.m_lineEndX = gap.GetX1();
+                parameters.m_lineStartZ = ((gapSizeY > maxGapSize) ? gap.GetZ1() : gap.GetY1());
+                parameters.m_lineEndZ = ((gapSizeY > maxGapSize) ? gap.GetZ2() : gap.GetY2());
+            }
+            
+            catch (const pandora::StatusCodeException &)
+            {
+                mf::LogWarning("LArPandora") << "CreatePandoraDetectorGaps - invalid line gap parameter provided, all assigned values must be finite, line gap omitted " << std::endl;
+                continue;
+            }
+            try
+            {
+                PANDORA_THROW_RESULT_IF(pandora::STATUS_CODE_SUCCESS, !=, PandoraApi::Geometry::LineGap::Create(*pPandora, parameters));
+            }
+            catch (const pandora::StatusCodeException &)
+            {
+                mf::LogWarning("LArPandora") << "CreatePandoraDetectorGaps - unable to create line gap, insufficient or invalid information supplied " << std::endl;
+                continue;
+            }
+            continue; //No drift gaps in DP
+        }
+        
         try
         {
             parameters.m_lineGapType = pandora::TPC_DRIFT_GAP;
@@ -250,66 +286,6 @@ void LArPandoraInput::CreatePandoraDetectorGaps(const Settings &settings, const 
             continue;
         }
     }
-
-    //Create CRP gaps for DP
-    art::ServiceHandle<geo::Geometry const> theGeometry;
-    const bool isDualPhase(theGeometry->MaxPlanes() == 2);
-    const int nCRPs(theGeometry->NTPC());
-    if(!isDualPhase || nCRPs!=4) return; //only add CRP gaps if ProtoDUNE DP
-
-    const double crpGapLowerZ_y(-0.64875), crpGapUpperZ_y(0.66375);
-    const double crpGapLowerZ_z(299.851), crpGapUpperZ_z(301.164);
-
-    for (const LArDriftVolume &driftVolume : driftVolumeList)
-    {
-
-	    PandoraApi::Geometry::LineGap::Parameters parameters;
-	    try
-	    {
-	      parameters.m_lineGapType = pandora::TPC_WIRE_GAP_VIEW_U;
-	      //parameters.m_lineStartX = -std::numeric_limits<float>::max();
-	      //parameters.m_lineEndX = std::numeric_limits<float>::max();
-	      parameters.m_lineStartX = driftVolume.GetCenterX() - 0.5f * driftVolume.GetWidthX();
-	      parameters.m_lineEndX = driftVolume.GetCenterX() + 0.5f * driftVolume.GetWidthX();
-	      parameters.m_lineStartZ = crpGapLowerZ_z;
-	      parameters.m_lineEndZ = crpGapUpperZ_z;
-	    }
-	    catch (const pandora::StatusCodeException &)
-	    {
-	      mf::LogWarning("LArPandora") << "CreatePandoraDetectorGaps - invalid line gap parameter provided, all assigned values must be finite, line gap omitted " << std::endl;
-	    }
-	    try
-	    {
-	      PANDORA_THROW_RESULT_IF(pandora::STATUS_CODE_SUCCESS, !=, PandoraApi::Geometry::LineGap::Create(*pPandora, parameters));
-	    }
-	    catch (const pandora::StatusCodeException &)
-	    {
-	      mf::LogWarning("LArPandora") << "CreatePandoraDetectorGaps - unable to create line gap, insufficient or invalid information supplied " << std::endl;
-	    }
-
-	    try
-	    {
-	      parameters.m_lineGapType = pandora::TPC_WIRE_GAP_VIEW_V;
-	      //parameters.m_lineStartX = -std::numeric_limits<float>::max();
-	      //parameters.m_lineEndX = std::numeric_limits<float>::max();
-	      parameters.m_lineStartX = driftVolume.GetCenterX() - 0.5f * driftVolume.GetWidthX();
-	      parameters.m_lineEndX = driftVolume.GetCenterX() + 0.5f * driftVolume.GetWidthX();
-	      parameters.m_lineStartZ = crpGapLowerZ_y;
-	      parameters.m_lineEndZ = crpGapUpperZ_y;
-	    }
-	    catch (const pandora::StatusCodeException &)
-	    {
-	      mf::LogWarning("LArPandora") << "CreatePandoraDetectorGaps - invalid line gap parameter provided, all assigned values must be finite, line gap omitted " << std::endl;
-	    }
-	    try
-	    {
-	      PANDORA_THROW_RESULT_IF(pandora::STATUS_CODE_SUCCESS, !=, PandoraApi::Geometry::LineGap::Create(*pPandora, parameters));
-	    }
-	    catch (const pandora::StatusCodeException &)
-	    {
-	      mf::LogWarning("LArPandora") << "CreatePandoraDetectorGaps - unable to create line gap, insufficient or invalid information supplied " << std::endl;
-	    }
-       }
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -317,107 +293,124 @@ void LArPandoraInput::CreatePandoraDetectorGaps(const Settings &settings, const 
 void LArPandoraInput::CreatePandoraReadoutGaps(const Settings &settings, const LArDriftVolumeMap &driftVolumeMap)
 {
     mf::LogDebug("LArPandora") << " *** LArPandoraInput::CreatePandoraReadoutGaps(...) *** " << std::endl;
-
+    
     if (!settings.m_pPrimaryPandora)
         throw cet::exception("LArPandora") << "CreatePandoraReadoutGaps - primary Pandora instance does not exist ";
-
+    
     const pandora::Pandora *pPandora(settings.m_pPrimaryPandora);
-
+    
     art::ServiceHandle<geo::Geometry const> theGeometry;
     const lariov::ChannelStatusProvider &channelStatus(art::ServiceHandle<lariov::ChannelStatusService const>()->GetProvider());
+    
+    const bool isDualPhase(theGeometry->MaxPlanes() == 2);
 
     for (unsigned int icstat = 0; icstat < theGeometry->Ncryostats(); ++icstat)
     {
         for (unsigned int itpc = 0; itpc < theGeometry->NTPC(icstat); ++itpc)
         {
             const geo::TPCGeo &TPC(theGeometry->TPC(itpc));
-
+            
             for (unsigned int iplane = 0; iplane < TPC.Nplanes(); ++iplane)
             {
                 const geo::PlaneGeo &plane(TPC.Plane(iplane));
                 const float halfWirePitch(0.5f * theGeometry->WirePitch(plane.View()));
                 const unsigned int nWires(theGeometry->Nwires(plane.ID()));
-
+                
                 int firstBadWire(-1), lastBadWire(-1);
-
+                
                 for (unsigned int iwire = 0; iwire < nWires; ++iwire)
                 {
                     const raw::ChannelID_t channel(theGeometry->PlaneWireToChannel(iplane, iwire, itpc, icstat));
                     const bool isBadChannel(channelStatus.IsBad(channel));
                     const bool isLastWire(nWires == (iwire + 1));
-
+                    
                     if (isBadChannel && (firstBadWire < 0))
                         firstBadWire = iwire;
-
+                    
                     if (isBadChannel || isLastWire)
                         lastBadWire = iwire;
-
+                    
                     if (isBadChannel && !isLastWire)
                         continue;
 
                     if ((firstBadWire < 0) || (lastBadWire < 0))
                         continue;
-
+                    
                     double firstXYZ[3], lastXYZ[3];
                     theGeometry->Cryostat(icstat).TPC(itpc).Plane(iplane).Wire(firstBadWire).GetCenter(firstXYZ);
                     theGeometry->Cryostat(icstat).TPC(itpc).Plane(iplane).Wire(lastBadWire).GetCenter(lastXYZ);
-
+                    
                     firstBadWire = -1; lastBadWire = -1;
-
+                    
                     PandoraApi::Geometry::LineGap::Parameters parameters;
-
+                    
                     try
                     {
                         parameters.m_lineStartX = -std::numeric_limits<float>::max();
                         parameters.m_lineEndX = std::numeric_limits<float>::max();
-
+                        
                         const unsigned int volumeId(LArPandoraGeometry::GetVolumeID(driftVolumeMap, icstat, itpc));
                         LArDriftVolumeMap::const_iterator volumeIter(driftVolumeMap.find(volumeId));
-
+                        
                         if (driftVolumeMap.end() != volumeIter)
                         {
                             parameters.m_lineStartX = volumeIter->second.GetCenterX() - 0.5f * volumeIter->second.GetWidthX();
                             parameters.m_lineEndX = volumeIter->second.GetCenterX() + 0.5f * volumeIter->second.GetWidthX();
                         }
-
+                        
                         const geo::View_t iview = (geo::View_t)plane.View();
                         const geo::View_t pandoraView(LArPandoraGeometry::GetGlobalView(icstat, itpc, iview));
-
-                        if (pandoraView == geo::kW || pandoraView == geo::kZ)
+                        
+                        if(isDualPhase)
                         {
-                            const float firstW(firstXYZ[2]);
-                            const float lastW(lastXYZ[2]);
-
-                            parameters.m_lineGapType = pandora::TPC_WIRE_GAP_VIEW_U;
-                            parameters.m_lineStartZ = std::min(firstW, lastW) - halfWirePitch;
-                            parameters.m_lineEndZ = std::max(firstW, lastW) + halfWirePitch;
+                            if (pandoraView == geo::kW || pandoraView == geo::kZ)
+                            {
+                                const float firstW(firstXYZ[2]);
+                                const float lastW(lastXYZ[2]);
+                                
+                                parameters.m_lineGapType = pandora::TPC_WIRE_GAP_VIEW_U;
+                                parameters.m_lineStartZ = std::min(firstW, lastW) - halfWirePitch;
+                                parameters.m_lineEndZ = std::max(firstW, lastW) + halfWirePitch;
+                            }
+                            else if (pandoraView == geo::kY)
+                            {
+                                const float firstY(firstXYZ[1]);
+                                const float lastY(lastXYZ[1]);
+                                
+                                parameters.m_lineGapType = pandora::TPC_WIRE_GAP_VIEW_V;
+                                parameters.m_lineStartZ = std::min(firstY, lastY) - halfWirePitch;
+                                parameters.m_lineEndZ = std::max(firstY, lastY) + halfWirePitch;
+                            }
                         }
-                        if (pandoraView == geo::kY)
+                        else 
                         {
-                            const float firstW(firstXYZ[1]);
-                            const float lastW(lastXYZ[1]);
-
-                            parameters.m_lineGapType = pandora::TPC_WIRE_GAP_VIEW_V;
-                            parameters.m_lineStartZ = std::min(firstW, lastW) - halfWirePitch;
-                            parameters.m_lineEndZ = std::max(firstW, lastW) + halfWirePitch;
-                        }
-                        else if (pandoraView == geo::kU)
-                        {
-                            const float firstU(pPandora->GetPlugins()->GetLArTransformationPlugin()->YZtoU(firstXYZ[1], firstXYZ[2]));
-                            const float lastU(pPandora->GetPlugins()->GetLArTransformationPlugin()->YZtoU(lastXYZ[1], lastXYZ[2]));
-
-                            parameters.m_lineGapType = pandora::TPC_WIRE_GAP_VIEW_U;
-                            parameters.m_lineStartZ = std::min(firstU, lastU) - halfWirePitch;
-                            parameters.m_lineEndZ = std::max(firstU, lastU) + halfWirePitch;
-                        }
-                        else if (pandoraView == geo::kV)
-                        {
-                            const float firstV(pPandora->GetPlugins()->GetLArTransformationPlugin()->YZtoV(firstXYZ[1], firstXYZ[2]));
-                            const float lastV(pPandora->GetPlugins()->GetLArTransformationPlugin()->YZtoV(lastXYZ[1], lastXYZ[2]));
-
-                            parameters.m_lineGapType = pandora::TPC_WIRE_GAP_VIEW_V;
-                            parameters.m_lineStartZ = std::min(firstV, lastV) - halfWirePitch;
-                            parameters.m_lineEndZ = std::max(firstV, lastV) + halfWirePitch;
+                            if (pandoraView == geo::kW || pandoraView == geo::kY)
+                            {
+                                const float firstW(firstXYZ[2]);
+                                const float lastW(lastXYZ[2]);
+                                
+                                parameters.m_lineGapType = pandora::TPC_WIRE_GAP_VIEW_W;
+                                parameters.m_lineStartZ = std::min(firstW, lastW) - halfWirePitch;
+                                parameters.m_lineEndZ = std::max(firstW, lastW) + halfWirePitch;
+                            }
+                            else if (pandoraView == geo::kU)
+                            {
+                                const float firstU(pPandora->GetPlugins()->GetLArTransformationPlugin()->YZtoU(firstXYZ[1], firstXYZ[2]));
+                                const float lastU(pPandora->GetPlugins()->GetLArTransformationPlugin()->YZtoU(lastXYZ[1], lastXYZ[2]));
+                                
+                                parameters.m_lineGapType = pandora::TPC_WIRE_GAP_VIEW_U;
+                                parameters.m_lineStartZ = std::min(firstU, lastU) - halfWirePitch;
+                                parameters.m_lineEndZ = std::max(firstU, lastU) + halfWirePitch;
+                            }
+                            else if (pandoraView == geo::kV)
+                            {
+                                const float firstV(pPandora->GetPlugins()->GetLArTransformationPlugin()->YZtoV(firstXYZ[1], firstXYZ[2]));
+                                const float lastV(pPandora->GetPlugins()->GetLArTransformationPlugin()->YZtoV(lastXYZ[1], lastXYZ[2]));
+                                
+                                parameters.m_lineGapType = pandora::TPC_WIRE_GAP_VIEW_V;
+                                parameters.m_lineStartZ = std::min(firstV, lastV) - halfWirePitch;
+                                parameters.m_lineEndZ = std::max(firstV, lastV) + halfWirePitch;
+                            }
                         }
                     }
                     catch (const pandora::StatusCodeException &)
@@ -425,7 +418,7 @@ void LArPandoraInput::CreatePandoraReadoutGaps(const Settings &settings, const L
                         mf::LogWarning("LArPandora") << "CreatePandoraReadoutGaps - invalid line gap parameter provided, all assigned values must be finite, line gap omitted " << std::endl;
                         continue;
                     }
-
+                    
                     try
                     {
                         PANDORA_THROW_RESULT_IF(pandora::STATUS_CODE_SUCCESS, !=, PandoraApi::Geometry::LineGap::Create(*pPandora, parameters));
