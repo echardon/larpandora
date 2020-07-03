@@ -232,19 +232,16 @@ void LArPandoraInput::CreatePandoraDetectorGaps(const Settings &settings, const 
         
         if (isDualPhase)
         {
-            const float gapSizeY (std::fabs(gap.GetY2() - gap.GetY1())); //Could have chosen Z here, resulting in switching Y<->Z and U<->V in the try{...} block below
-            
-            const float maxGapSize (30.); //Match the maxDisplacement variable hard-coded value in LArPandoraGeometry
-             
+            const bool  isGapInU ((std::fabs(gap.GetY2() - gap.GetY1()) > gap.GetMaxGapSize())); //Could have chosen Z here, resulting in switching Y<->Z and U<->V in the try{...} block below
+
             try
             {
-                parameters.m_lineGapType = ((gapSizeY > maxGapSize) ? pandora::TPC_WIRE_GAP_VIEW_U : pandora::TPC_WIRE_GAP_VIEW_V); //If gapSizeY is too large then the gap is in Z, therefore should be in kU (i.e. kZ)
+                parameters.m_lineGapType = ( isGapInU ? pandora::TPC_WIRE_GAP_VIEW_U : pandora::TPC_WIRE_GAP_VIEW_V); //If gapSizeY is too large then the gap is in Z, therefore should be in kU (i.e. kZ)
                 parameters.m_lineStartX = gap.GetX2();
                 parameters.m_lineEndX = gap.GetX1();
-                parameters.m_lineStartZ = ((gapSizeY > maxGapSize) ? gap.GetZ1() : gap.GetY1());
-                parameters.m_lineEndZ = ((gapSizeY > maxGapSize) ? gap.GetZ2() : gap.GetY2());
+                parameters.m_lineStartZ = ( isGapInU ? gap.GetZ1() : gap.GetY1());
+                parameters.m_lineEndZ = ( isGapInU ? gap.GetZ2() : gap.GetY2());
             }
-            
             catch (const pandora::StatusCodeException &)
             {
                 mf::LogWarning("LArPandora") << "CreatePandoraDetectorGaps - invalid line gap parameter provided, all assigned values must be finite, line gap omitted " << std::endl;
@@ -261,7 +258,6 @@ void LArPandoraInput::CreatePandoraDetectorGaps(const Settings &settings, const 
             }
             continue; //No drift gaps in DP
         }
-        
         try
         {
             parameters.m_lineGapType = pandora::TPC_DRIFT_GAP;

@@ -63,6 +63,11 @@ public:
      */
     float GetZ2() const;
 
+    /**
+     *  @brief Get maximum gap size
+     */
+    static float GetMaxGapSize();
+
 private:
     float   m_x1;
     float   m_y1;
@@ -70,6 +75,7 @@ private:
     float   m_x2;
     float   m_y2;
     float   m_z2;
+    float   m_maxGapSize;
 };
 
 typedef std::vector<LArDetectorGap> LArDetectorGapList;
@@ -379,6 +385,13 @@ inline float LArDetectorGap::GetY2() const
 inline float LArDetectorGap::GetZ2() const
 {
     return m_z2;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+inline float LArDetectorGap::GetMaxGapSize()
+{
+    return 30.f; // TODO: 30cm should be fine but can we do better than a hard-coded number here?
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------

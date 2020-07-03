@@ -37,7 +37,6 @@ void LArPandoraGeometry::LoadDetectorGaps(LArDetectorGapList &listOfGaps)
     {
         const LArDriftVolume &driftVolume1 = *iter1;
         
-        
         for (LArDriftVolumeList::const_iterator iter2 = iter1, iterEnd2 = driftVolumeList.end(); iter2 != iterEnd2; ++iter2)
         {
             const LArDriftVolume &driftVolume2 = *iter2;
@@ -45,7 +44,7 @@ void LArPandoraGeometry::LoadDetectorGaps(LArDetectorGapList &listOfGaps)
             if (driftVolume1.GetVolumeID() == driftVolume2.GetVolumeID())
                 continue;
 
-            const float maxDisplacement(30.f); // TODO: 30cm should be fine, but can we do better than a hard-coded number here?
+            const float maxDisplacement(LArDetectorGap::GetMaxGapSize());
 
             const float deltaX(std::fabs(driftVolume1.GetCenterX() - driftVolume2.GetCenterX()));
             const float deltaY(std::fabs(driftVolume1.GetCenterY() - driftVolume2.GetCenterY()));
@@ -63,25 +62,22 @@ void LArPandoraGeometry::LoadDetectorGaps(LArDetectorGapList &listOfGaps)
                 continue;
             
             const float X1((driftVolume1.GetCenterX() < driftVolume2.GetCenterX()) ? (driftVolume1.GetCenterX() + 0.5f * driftVolume1.GetWidthX()) :
-                           (driftVolume2.GetCenterX() + 0.5f * driftVolume2.GetWidthX()));
+                (driftVolume2.GetCenterX() + 0.5f * driftVolume2.GetWidthX()));
             const float X2((driftVolume1.GetCenterX() > driftVolume2.GetCenterX()) ? (driftVolume1.GetCenterX() - 0.5f * driftVolume1.GetWidthX()) :
-                           (driftVolume2.GetCenterX() - 0.5f * driftVolume2.GetWidthX()));
+                (driftVolume2.GetCenterX() - 0.5f * driftVolume2.GetWidthX()));
             const float Y1(std::min((driftVolume1.GetCenterY() - 0.5f * driftVolume1.GetWidthY()),
-                                    (driftVolume2.GetCenterY() - 0.5f * driftVolume2.GetWidthY())));
+                (driftVolume2.GetCenterY() - 0.5f * driftVolume2.GetWidthY())));
             const float Y2(std::max((driftVolume1.GetCenterY() + 0.5f * driftVolume1.GetWidthY()),
-                                    (driftVolume2.GetCenterY() + 0.5f * driftVolume2.GetWidthY())));
+                (driftVolume2.GetCenterY() + 0.5f * driftVolume2.GetWidthY())));
             const float Z1(std::min((driftVolume1.GetCenterZ() - 0.5f * driftVolume1.GetWidthZ()),
-                                    (driftVolume2.GetCenterZ() - 0.5f * driftVolume2.GetWidthZ())));
+                (driftVolume2.GetCenterZ() - 0.5f * driftVolume2.GetWidthZ())));
             const float Z2(std::max((driftVolume1.GetCenterZ() + 0.5f * driftVolume1.GetWidthZ()),
-                                    (driftVolume2.GetCenterZ() + 0.5f * driftVolume2.GetWidthZ())));
+                (driftVolume2.GetCenterZ() + 0.5f * driftVolume2.GetWidthZ())));
             
             if (isDualPhase && (std::fabs(gapY) > maxDisplacement || std::fabs(gapZ) > maxDisplacement))
-            {
-                listOfGaps.push_back(LArDetectorGap(X1, Y1 + widthY, Z1 + widthY, X2, Y2 - widthY, Z2 - widthZ));
-                continue;
-            }
+                listOfGaps.push_back(LArDetectorGap(X1, Y1 + widthY, Z1 + widthZ, X2, Y2 - widthY, Z2 - widthZ));
 
-            if (!isDualPhase)
+            else if (!isDualPhase)
                 listOfGaps.push_back(LArDetectorGap(X1, Y1, Z1, X2, Y2, Z2));
         }
     }
@@ -287,12 +283,12 @@ void LArPandoraGeometry::LoadGeometry(LArDriftVolumeList &driftVolumeList)
                 tpcVolumeList.push_back(LArDaughterDriftVolume(icstat, itpc1));
                 
                 driftVolumeList.push_back(LArDriftVolume(driftVolumeList.size(), isPositiveDrift,
-                                                         wirePitchU, wirePitchV, wirePitchW, wireAngleU, wireAngleV, wireAngleW,
-                                                         0.5f * (driftMaxX + driftMinX), 0.5f * (driftMaxY + driftMinY), 0.5f * (driftMaxZ + driftMinZ),
-                                                         (driftMaxX - driftMinX), (driftMaxY - driftMinY), (driftMaxZ - driftMinZ),
-                                                         (wirePitchU + wirePitchV + wirePitchW + 0.1f), tpcVolumeList));
-                
+                    wirePitchU, wirePitchV, wirePitchW, wireAngleU, wireAngleV, wireAngleW,
+                    0.5f * (driftMaxX + driftMinX), 0.5f * (driftMaxY + driftMinY), 0.5f * (driftMaxZ + driftMinZ),
+                    (driftMaxX - driftMinX), (driftMaxY - driftMinY), (driftMaxZ - driftMinZ),
+                    (wirePitchU + wirePitchV + wirePitchW + 0.1f), tpcVolumeList));
             }
+
             // Now identify the other TPCs associated with this drift volume
             for (unsigned int itpc2 = itpc1+1; itpc2 < theGeometry->NTPC(icstat); ++itpc2)
             {
@@ -328,12 +324,12 @@ void LArPandoraGeometry::LoadGeometry(LArDriftVolumeList &driftVolumeList)
                 cstatList.insert(itpc2);
                 tpcList.insert(itpc2);
                 
-                float driftMinX2(worldCoord2[0] - theTpc2.ActiveHalfWidth());
-                float driftMaxX2(worldCoord2[0] + theTpc2.ActiveHalfWidth());
-                float driftMinY2(worldCoord2[1] - theTpc2.ActiveHalfHeight());
-                float driftMaxY2(worldCoord2[1] + theTpc2.ActiveHalfHeight());
-                float driftMinZ2(worldCoord2[2] - 0.5f * theTpc2.ActiveLength());
-                float driftMaxZ2(worldCoord2[2] + 0.5f * theTpc2.ActiveLength());
+                const float driftMinX2(worldCoord2[0] - theTpc2.ActiveHalfWidth());
+                const float driftMaxX2(worldCoord2[0] + theTpc2.ActiveHalfWidth());
+                const float driftMinY2(worldCoord2[1] - theTpc2.ActiveHalfHeight());
+                const float driftMaxY2(worldCoord2[1] + theTpc2.ActiveHalfHeight());
+                const float driftMinZ2(worldCoord2[2] - 0.5f * theTpc2.ActiveLength());
+                const float driftMaxZ2(worldCoord2[2] + 0.5f * theTpc2.ActiveLength());
                 
                 driftMinX = std::min(driftMinX, driftMinX2);
                 driftMaxX = std::max(driftMaxX, driftMaxX2);
@@ -348,10 +344,10 @@ void LArPandoraGeometry::LoadGeometry(LArDriftVolumeList &driftVolumeList)
                     tpcVolumeList.push_back(LArDaughterDriftVolume(icstat, itpc2));
                     
                     driftVolumeList.push_back(LArDriftVolume(driftVolumeList.size(), isPositiveDrift,
-                                                             wirePitchU, wirePitchV, wirePitchW, wireAngleU, wireAngleV, wireAngleW,
-                                                             0.5f * (driftMaxX2 + driftMinX2), 0.5f * (driftMaxY2 + driftMinY2), 0.5f * (driftMaxZ2 + driftMinZ2),
-                                                             (driftMaxX2 - driftMinX2), (driftMaxY2 - driftMinY2), (driftMaxZ2 - driftMinZ2),
-                                                             (wirePitchU + wirePitchV + wirePitchW + 0.1f), tpcVolumeList));
+                        wirePitchU, wirePitchV, wirePitchW, wireAngleU, wireAngleV, wireAngleW,
+                        0.5f * (driftMaxX2 + driftMinX2), 0.5f * (driftMaxY2 + driftMinY2), 0.5f * (driftMaxZ2 + driftMinZ2),
+                        (driftMaxX2 - driftMinX2), (driftMaxY2 - driftMinY2), (driftMaxZ2 - driftMinZ2),
+                        (wirePitchU + wirePitchV + wirePitchW + 0.1f), tpcVolumeList));
                 }
                 
             }
@@ -367,10 +363,10 @@ void LArPandoraGeometry::LoadGeometry(LArDriftVolumeList &driftVolumeList)
             // Create new daughter drift volume (volume ID = 0 to N-1)
             if (!isDualPhase)
                 driftVolumeList.push_back(LArDriftVolume(driftVolumeList.size(), isPositiveDrift,
-                                                         wirePitchU, wirePitchV, wirePitchW, wireAngleU, wireAngleV, wireAngleW,
-                                                         0.5f * (driftMaxX + driftMinX), 0.5f * (driftMaxY + driftMinY), 0.5f * (driftMaxZ + driftMinZ),
-                                                         (driftMaxX - driftMinX), (driftMaxY - driftMinY), (driftMaxZ - driftMinZ),
-                                                         (wirePitchU + wirePitchV + wirePitchW + 0.1f), tpcVolumeList));
+                    wirePitchU, wirePitchV, wirePitchW, wireAngleU, wireAngleV, wireAngleW,
+                    0.5f * (driftMaxX + driftMinX), 0.5f * (driftMaxY + driftMinY), 0.5f * (driftMaxZ + driftMinZ),
+                    (driftMaxX - driftMinX), (driftMaxY - driftMinY), (driftMaxZ - driftMinZ),
+                    (wirePitchU + wirePitchV + wirePitchW + 0.1f), tpcVolumeList));
         }
     }
 
