@@ -75,7 +75,6 @@ private:
     float   m_x2;
     float   m_y2;
     float   m_z2;
-    float   m_maxGapSize;
 };
 
 typedef std::vector<LArDetectorGap> LArDetectorGapList;
@@ -92,24 +91,67 @@ public:
     /**
      *  @brief  Constructor
      *
-     *  @param  cryostat  the cryostat ID
-     *  @param  tpc       the tpc ID
+     *  @param  cryostat         the cryostat ID
+     *  @param  tpc              the tpc ID
+     *  @param  centerX          centre of tpc volume (X)
+     *  @param  centerY          centre of tpc volume (Y)
+     *  @param  centerZ          centre of tpc volume (Z)
+     *  @param  widthX           width of tpc volume (X)
+     *  @param  widthY           width of tpc volume (Y)
+     *  @param  widthZ           width of tpc volume (Z)
      */
-    LArDaughterDriftVolume(const unsigned int cryostat, const unsigned int tpc);
+    LArDaughterDriftVolume(const unsigned int cryostat, const unsigned int tpc, 
+        const float centerX, const float centerY, const float centerZ, const float widthX, const float widthY, const float widthZ);
 
     /**
-     *  @brief  return cryostat ID
+     *  @brief  Return cryostat ID
      */
     unsigned int GetCryostat() const;
 
     /**
-     *  @brief  return tpc ID
+     *  @brief  Return tpc ID
      */
     unsigned int GetTpc() const;
 
+    /**
+     *  @brief Return X position at centre of tpc volume
+     */
+    float GetCenterX() const;
+
+    /**
+     *  @brief Return Y position at centre of tpc volume
+     */
+    float GetCenterY() const;
+
+    /**
+     *  @brief Return Z position at centre of tpc volume
+     */
+    float GetCenterZ() const;
+
+    /**
+     *  @brief Return X span of tpc volume
+     */
+    float GetWidthX() const;
+
+    /**
+     *  @brief Return Y span of tpc volume
+     */
+    float GetWidthY() const;
+
+    /**
+     *  @brief Return Z span of tpc volume
+     */
+    float GetWidthZ() const;
+
 private:
-    unsigned int  m_cryostat;
-    unsigned int  m_tpc;
+    unsigned int    m_cryostat;
+    unsigned int    m_tpc;
+    float           m_centerX;
+    float           m_centerY;
+    float           m_centerZ;
+    float           m_widthX;
+    float           m_widthY;
+    float           m_widthZ;
 };
 
 typedef std::vector<LArDaughterDriftVolume> LArDaughterDriftVolumeList;
@@ -397,8 +439,9 @@ inline float LArDetectorGap::GetMaxGapSize()
 //------------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline LArDaughterDriftVolume::LArDaughterDriftVolume(const unsigned int cryostat, const unsigned int tpc) :
-    m_cryostat(cryostat), m_tpc(tpc)
+inline LArDaughterDriftVolume::LArDaughterDriftVolume(const unsigned int cryostat, const unsigned int tpc, 
+           const float centerX, const float centerY, const float centerZ, const float widthX, const float widthY, const float widthZ) : 
+    m_cryostat(cryostat), m_tpc(tpc), m_centerX(centerX), m_centerY(centerY), m_centerZ(centerZ), m_widthX(widthX), m_widthY(widthY), m_widthZ(widthZ) 
 {
 }
 
@@ -414,6 +457,48 @@ inline unsigned int LArDaughterDriftVolume::GetCryostat() const
 inline unsigned int LArDaughterDriftVolume::GetTpc() const
 {
     return m_tpc;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+inline float LArDaughterDriftVolume::GetCenterX() const
+{
+    return m_centerX;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+inline float LArDaughterDriftVolume::GetCenterY() const
+{
+    return m_centerY;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+inline float LArDaughterDriftVolume::GetCenterZ() const
+{
+    return m_centerZ;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+inline float LArDaughterDriftVolume::GetWidthX() const
+{
+    return m_widthX;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+inline float LArDaughterDriftVolume::GetWidthY() const
+{
+    return m_widthY;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+inline float LArDaughterDriftVolume::GetWidthZ() const
+{
+    return m_widthZ;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
