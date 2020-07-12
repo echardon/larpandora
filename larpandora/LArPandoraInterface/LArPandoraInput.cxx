@@ -247,11 +247,8 @@ void LArPandoraInput::CreatePandoraDetectorGaps(const Settings &settings, const 
                 mf::LogWarning("LArPandora") << "CreatePandoraDetectorGaps - invalid line gap parameter provided, all assigned values must be finite, line gap omitted " << std::endl;
                 continue;
             }
-            try
-            {
-                PANDORA_THROW_RESULT_IF(pandora::STATUS_CODE_SUCCESS, !=, PandoraApi::Geometry::LineGap::Create(*pPandora, parameters));
-            }
-            catch (const pandora::StatusCodeException &)
+            auto const rc = PandoraApi::Geometry::LineGap::Create(*pPandora, parameters);
+            if (rc != pandora::STATUS_CODE_SUCCESS)
             {
                 mf::LogWarning("LArPandora") << "CreatePandoraDetectorGaps - unable to create line gap, insufficient or invalid information supplied " << std::endl;
                 continue;
@@ -354,7 +351,7 @@ void LArPandoraInput::CreatePandoraReadoutGaps(const Settings &settings, const L
                             parameters.m_lineEndX = volumeIter->second.GetCenterX() + 0.5f * volumeIter->second.GetWidthX();
                         }
 
-                        const geo::View_t iview = (geo::View_t)plane.View();
+                        const geo::View_t iview = plane.View();
                         const geo::View_t pandoraView(LArPandoraGeometry::GetGlobalView(icstat, itpc, iview));
 
                         if(isDualPhase)
