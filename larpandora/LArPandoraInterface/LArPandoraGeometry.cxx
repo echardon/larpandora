@@ -359,7 +359,11 @@ void LArPandoraGeometry::LoadGeometry(LArDriftVolumeList &driftVolumeList)
                     continue;
 
                 cstatList.insert(itpc2);
+<<<<<<< HEAD
                 //tpcList.insert(itpc2);
+=======
+                tpcList.insert(itpc2);
+>>>>>>> develop
 
                 const float driftMinX2(worldCoord2[0] - theTpc2.ActiveHalfWidth());
                 const float driftMaxX2(worldCoord2[0] + theTpc2.ActiveHalfWidth());
@@ -391,11 +395,11 @@ void LArPandoraGeometry::LoadGeometry(LArDriftVolumeList &driftVolumeList)
             */
             // Create new daughter drift volume (volume ID = 0 to N-1)
             //if (!isDualPhase)
-                driftVolumeList.emplace_back(LArDriftVolume(driftVolumeList.size(), isPositiveDrift,
-                    wirePitchU, wirePitchV, wirePitchW, wireAngleU, wireAngleV, wireAngleW,
-                    0.5f * (driftMaxX + driftMinX), 0.5f * (driftMaxY + driftMinY), 0.5f * (driftMaxZ + driftMinZ),
-                    (driftMaxX - driftMinX), (driftMaxY - driftMinY), (driftMaxZ - driftMinZ),
-                    (wirePitchU + wirePitchV + wirePitchW + 0.1f), tpcVolumeList));
+            driftVolumeList.emplace_back(LArDriftVolume(driftVolumeList.size(), isPositiveDrift,
+                wirePitchU, wirePitchV, wirePitchW, wireAngleU, wireAngleV, wireAngleW,
+                0.5f * (driftMaxX + driftMinX), 0.5f * (driftMaxY + driftMinY), 0.5f * (driftMaxZ + driftMinZ),
+                (driftMaxX - driftMinX), (driftMaxY - driftMinY), (driftMaxZ - driftMinZ),
+                (wirePitchU + wirePitchV + wirePitchW + 0.1f), tpcVolumeList));
         }
     }
 

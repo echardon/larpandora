@@ -247,8 +247,9 @@ void LArPandoraInput::CreatePandoraDetectorGaps(const Settings &settings, const 
                 mf::LogWarning("LArPandora") << "CreatePandoraDetectorGaps - invalid line gap parameter provided, all assigned values must be finite, line gap omitted " << std::endl;
                 continue;
             }
+
             auto const rc = PandoraApi::Geometry::LineGap::Create(*pPandora, parameters);
-            if (rc != pandora::STATUS_CODE_SUCCESS)
+            if (rc != pandora::STATUS_CODE_SUCCESS) 
             {
                 mf::LogWarning("LArPandora") << "CreatePandoraDetectorGaps - unable to create line gap, insufficient or invalid information supplied " << std::endl;
                 continue;
