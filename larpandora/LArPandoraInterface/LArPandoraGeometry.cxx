@@ -359,11 +359,7 @@ void LArPandoraGeometry::LoadGeometry(LArDriftVolumeList &driftVolumeList)
                     continue;
 
                 cstatList.insert(itpc2);
-<<<<<<< HEAD
                 //tpcList.insert(itpc2);
-=======
-                tpcList.insert(itpc2);
->>>>>>> develop
 
                 const float driftMinX2(worldCoord2[0] - theTpc2.ActiveHalfWidth());
                 const float driftMaxX2(worldCoord2[0] + theTpc2.ActiveHalfWidth());
