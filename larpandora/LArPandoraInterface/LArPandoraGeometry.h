@@ -330,6 +330,15 @@ public:
     static unsigned int GetVolumeID(const LArDriftVolumeMap &driftVolumeMap, const unsigned int cstat, const unsigned int tpc);
 
     /**
+     *  @brief  Get drift volume ID from a specified cryostat/tpc pair
+     *
+     *  @param  driftVolumeMap the output mapping between cryostat/tpc and drift volumes
+     *  @param  cstat the input cryostat unique ID
+     *  @param  tpc the input tpc unique ID
+     */
+    static unsigned int GetDaughterVolumeID(const LArDriftVolumeMap &driftVolumeMap, const unsigned int cstat, const unsigned int tpc);
+
+    /**
      *  @brief  Convert to global coordinate system
      *
      *  @param  cstat the input cryostat

@@ -165,6 +165,27 @@ unsigned int LArPandoraGeometry::GetVolumeID(const LArDriftVolumeMap &driftVolum
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
+unsigned int LArPandoraGeometry::GetDaughterVolumeID(const LArDriftVolumeMap &driftVolumeMap, const unsigned int cstat, const unsigned int tpc)
+{
+    if (driftVolumeMap.empty())
+        throw cet::exception("LArPandora") << " LArPandoraGeometry::GetDaughterVolumeID --- detector geometry map is empty";
+
+    LArDriftVolumeMap::const_iterator iter = driftVolumeMap.find(LArPandoraGeometry::GetTpcID(cstat, tpc));
+
+    if (driftVolumeMap.end() == iter)
+        throw cet::exception("LArPandora") << " LArPandoraGeometry::GetDaughterVolumeID --- found a TPC volume that doesn't belong to a drift volume";
+
+    for (LArDaughterDriftVolumeList::const_iterator iterDghtr = iter->second.GetTpcVolumeList().begin(), iterDghtrEnd = iter->second.GetTpcVolumeList().end(); iterDghtr != iterDghtrEnd; ++iterDghtr)
+    {
+        const LArDaughterDriftVolume &daughterVolume = *iterDghtr;
+        if (cstat == daughterVolume.GetCryostat() && tpc == daughterVolume.GetTpc())
+            return std::distance(iter->second.GetTpcVolumeList().begin(), iterDghtr);
+    }
+    throw cet::exception("LArPandora") << " LArPandoraGeometry::GetDaughterVolumeID --- found a daughter volume that doesn't belong to the drift volume ";
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 geo::View_t LArPandoraGeometry::GetGlobalView(const unsigned int cstat, const unsigned int tpc, const geo::View_t hit_View)
 {
     const bool switchUV(LArPandoraGeometry::ShouldSwitchUV(cstat, tpc));

@@ -107,6 +107,9 @@ void LArPandoraInput::CreatePandoraHits2D(const Settings &settings, const LArDri
             caloHitParameters.m_hadronicEnergy = mips * settings.m_mips_to_gev;
             caloHitParameters.m_pParentAddress = (void*)((intptr_t)(++hitCounter));
             caloHitParameters.m_larTPCVolumeId = LArPandoraGeometry::GetVolumeID(driftVolumeMap, hit_WireID.Cryostat, hit_WireID.TPC);
+            caloHitParameters.m_daughterVolumeId = LArPandoraGeometry::GetDaughterVolumeID(driftVolumeMap, hit_WireID.Cryostat, hit_WireID.TPC);
+
+            std::cout << "caloHitParameters.m_daughterVolumeId = " << LArPandoraGeometry::GetDaughterVolumeID(driftVolumeMap, hit_WireID.Cryostat, hit_WireID.TPC) << std::endl;
 
             const geo::View_t pandora_GlobalView(LArPandoraGeometry::GetGlobalView(hit_WireID.Cryostat, hit_WireID.TPC, hit_View));
             const geo::View_t pandora_View(isDualPhase ? ((pandora_GlobalView == geo::kW) ? geo::kU :
