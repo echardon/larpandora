@@ -299,13 +299,12 @@ void LArPandoraGeometry::LoadGeometry(LArDriftVolumeList &driftVolumeList)
     for (unsigned int icstat = 0; icstat < theGeometry->Ncryostats(); ++icstat)
     {
         UIntSet cstatList;
-        std::cout << "Ncryostats = " << theGeometry->Ncryostats() << std::endl;
+
         // Loop over TPCs in in this cryostat
         for (unsigned int itpc1 = 0; itpc1 < theGeometry->NTPC(icstat); ++itpc1)
         {
             if (cstatList.end() != cstatList.find(itpc1))
                 continue;
-            std::cout << "NTPC = " <<theGeometry->NTPC(icstat) << std::endl;
 
             // Use this TPC to seed a drift volume
             const geo::TPCGeo &theTpc1(theGeometry->TPC(itpc1, icstat));
