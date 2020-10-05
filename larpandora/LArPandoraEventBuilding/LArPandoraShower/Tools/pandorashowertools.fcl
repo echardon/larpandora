@@ -1,0 +1,373 @@
+#include "trackfinderalgorithms.fcl"
+#include "pandorashoweralgs.fcl"
+#include "calorimetry.fcl"
+
+#There are more tools on DomBarker_ShowerBranch
+
+BEGIN_PROLOG
+
+showerbasetools:{
+    LArPandoraShowerAlg:         @local::standard_larpandorashoweralg
+    EnableEventDisplay: false
+}
+
+showerpcadirection:{
+    tool_type: ShowerPCADirection
+    BaseTools: @local::showerbasetools
+    # PFParticleLabel: "pandora"
+    NSegments: 6           #If using the RMS gradient to decide what direction to go in
+    #this is the number of segements to split the shower into.
+    UseStartPosition: true #The direction of the PCA is in the direction of
+    #(Shower Center - Start Position)
+    ChargeWeighted:   false #Apply a charge weighting in the PCA.
+    ShowerStartPositionInputLabel: "ShowerStartPosition"
+    ShowerDirectionOutputLabel: "ShowerDirection"
+    ShowerCentreOutputLabel: "ShowerCentre"
+    ShowerPCAOutputLabel: "ShowerPCA"
+}
+
+showerlinearenergy:{
+    tool_type:  ShowerLinearEnergy
+    BaseTools: @local::showerbasetools
+    # PFParticleLabel: "pandora"
+    # Overwrite the Gradients and Intercepts in you experiemnt repository
+    Gradients:   [] #Gradient of the linear graph of the total charge to total
+    #energy, in the Plane0 plane. in MeV/ADC.
+    Intercepts:  []     #Intercept of the linear graph of the total charge to total
+    ShowerEnergyOutputLabel: "ShowerEnergy"
+    ShowerBestPlaneOutputLabel: "ShowerBestPlane"
+}
+
+showernumelectronsenergy:{
+     tool_type:  ShowerNumElectronsEnergy
+     BaseTools: @local::showerbasetools
+     CalorimetryAlg: @nil
+     RecombinationFactor: 0.64
+     # PFParticleLabel: "pandora"
+ }
+
+
+shower2Dlinearregressiontrackhitfinder:{
+    tool_type:             Shower2DLinearRegressionTrackHitFinder
+    BaseTools:             @local::showerbasetools
+    Nfitpass:              4                     #Number of time to fit the straight line
+    #to the hits
+    Nfithits:              [83, 50, 33, 33]      #Max Number of hits to fit to
+    Toler:                 [50., 8.3, 3.3, 3.3 ] #Tolerance or each interaction. Defined
+    #as the perpendicualar distance from
+    #the best fit line.
+    ApplyChargeWeight:     true                  #Apply charge weighting to the fit.
+    # PFParticleLabel: "pandora"
+    HitsModuleLabel:       "linecluster"
+    ShowerStartPositionInputLabel: "ShowerStartPosition"
+    ShowerDirectionInputLabel: "ShowerDirection"
+    InitialTrackHitsOutputLabel: "InitialTrackHits"
+    InitialTrackSpacePointsOutputLabel: "InitialTrackSpacePoints"
+
+    }
+
+
+showerpandoraslidingfittrackfinder:{
+    tool_type: ShowerPandoraSlidingFitTrackFinder
+    BaseTools: @local::showerbasetools
+    SlidingFitHalfWindow: 12 #Fill definition
+    MinTrajectoryPoints: 2   #Max number of trajectory points
+    #required to say the fit as good
+    InitialTrackLengthOutputLabel: "InitialTrackLength"
+    InitialTrackOutputLabel: "InitialTrack"
+    ShowerStartPositionInputLabel: "ShowerStartPosition"
+    ShowerDirectionInputLabel: "ShowerDirection"
+    InitialTrackSpacePointsInputLabel: "InitialTrackSpacePoints"
+    InitialTrackHitsInputLabel: "InitialTrackHits"
+}
+
+
+shower3dcylindertrackhitfinder:{
+    tool_type: Shower3DCylinderTrackHitFinder
+    BaseTools: @local::showerbasetools
+
+    # PFParticleLabel: "pandora"
+    MaxProjectionDist:     10     #Max distance a hit can be in the direction of
+    #the shower in cm
+    MaxPerpendicularDist:  1      #Max distance a hit can be in the perpendicular
+    #direction of the shower in cm
+    ForwardHitsOnly:       true   #Don't use hits behind the vertex.
+    DebugEVD:              false
+    #MaxProjectionDist
+    ShowerStartPositionInputLabel: "ShowerStartPosition"
+    ShowerDirectionInputLabel: "ShowerDirection"
+    InitialTrackHitsOutputLabel: "InitialTrackHits"
+    InitialTrackSpacePointsOutputLabel: "InitialTrackSpacePoints"
+}
+
+showerpfpvertexstartposition:{
+    tool_type: ShowerPFPVertexStartPosition
+    BaseTools: @local::showerbasetools
+    # PFParticleLabel: "pandora"
+    ShowerStartPositionOutputLabel: "ShowerStartPosition"
+    ShowerDirectionInputLabel: "ShowerDirection"
+}
+
+showerunidirectiondedx:{
+    tool_type: ShowerUnidirectiondEdx
+    BaseTools: @local::showerbasetools
+
+    CalorimetryAlg:  @nil
+    MaxHitPlane:     true #Set the best planes as the one with the most hits
+    MissFirstPoint:  true #Do not use any hits from the first wire
+    dEdxTrackLength: 3    #Max length from a hit can be to the start point in cm.
+    ShowerStartPositionInputLabel: "ShowerStartPosition"
+    InitialTrackHitsInputLabel: "InitialTrackHits"
+    ShowerDirectionInputLabel: "ShowerDirection"
+    ShowerdEdxOutputLabel: "ShowerdEdx"
+    ShowerBestPlaneOutputLabel: "ShowerBestPlane"
+}
+
+showertrackhitdirection:{
+    tool_type: ShowerTrackHitDirection
+    BaseTools: @local::showerbasetools
+    UsePandoraVertex:      true #Direction from point defined as
+    #(Position of Hit - Vertex) rather than
+    #(Position of Hit - Track Start Point).
+    HitModuleLabel:        "linecluster"
+    # PFParticleLabel: "pandora"
+    InitialTrackHitsInputLabel: "InitialTrackHits"
+    ShowerStartPositionInputLabel: "ShowerStartPosition"
+    InitialTrackInputLabel: "InitialTrack"
+    ShowerDirectionOutputLabel: "ShowerDirection"
+}
+
+showertrackspacepointdirection:{
+    tool_type: ShowerTrackSpacePointDirection
+    BaseTools: @local::showerbasetools
+    UsePandoraVertex: true #Direction from point defined as
+    #(Position of SP - Vertex) rather than
+    #(Position of SP - Track Start Point).
+    InitialTrackSpacePointsInputLabel: "InitialTrackSpacePoints"
+    ShowerStartPositionInputLabel: "ShowerStartPosition"
+    InitialTrackInputLabel: "InitialTrack"
+    ShowerDirectionOutputLabel: "ShowerDirection"
+}
+
+showertrackdirection:{
+    tool_type: ShowerTrackDirection
+    BaseTools: @local::showerbasetools
+    UsePandoraVertex: true #Direction from point defined as
+    #(Position of traj point - Vertex) rather than
+    #(Position of traj point - Track Start Point).
+    UsePositionInfo:  true #Don't use the directionAt point rather than definition above.
+    #i.e. ((Position of traj point + 1) - (Position of traj point)
+    DebugEVD:         false
+}
+
+showertracktrajpointdirection: {
+    tool_type: ShowerTrackTrajPointDirection
+    BaseTools: @local::showerbasetools
+
+    TrajPoint:         1   #Trajectory point to get the direction from.
+    UsePandoraVertex: false #Direction from point defined as
+    #(Position of traj point - Vertex) rather than
+    #(Position of traj point - Track Start Point).
+    UsePositonInfo:   false #Don't use the directionAt point rather than definition above.
+    #i.e. ((Position of traj point + 1) - (Position of traj point)
+    InitialTrackInputLabel: "InitialTrack"
+    ShowerStartPositionInputLabel: "ShowerStartPosition"
+    ShowerDirectionOutputLabel: "ShowerDirection"
+    }
+
+showertrackcolineartrajpointdirection: {
+    tool_type: ShowerTrackColinearTrajPointDirection
+    BaseTools: @local::showerbasetools
+    UsePandoraVertex:    false  #Direction from point defined as
+    #(Position of traj point - Vertex) rather than
+    #(Position of traj point - Track Start Point).
+    AllowDynamicSliding: true   #Rather than evualte the angle from the start use
+    #the previous trajectory point position.
+    UsePositionInfo:     false  #Don't use the DirectionAtPoint rather than
+    #definition above.
+    #((Position of traj point + 1) - (Position of traj point)
+    UseStartPos:         false  #Rather the using the angles between the directions
+    #from start position to the trajectory points
+    #use the angle between the the points themselves
+    AngleCut:           0.37 #Angle between the directions has to be less than
+    #this value in radians
+    InitialTrackInputLabel: "InitialTrack"
+    ShowerStartPositionInputLabel: "ShowerStartPosition"
+    ShowerDirectionOutputLabel: "ShowerDirection"
+}
+
+showertrackpcadirection:{
+    tool_type: ShowerTrackPCADirection
+    DebugEVD:               false
+    ChargeWeighted:         true      #Should the PCA be charge weighted.
+    MinPCAPoints:           10        #Number of spacepoints needed to the anlaysis.
+    # PFParticleLabel: "pandora"
+    HitModuleLabel:        "linecluster"
+    BaseTools:        @local::showerbasetools
+    CalorimetryAlg:   @nil
+    ShowerStartPositionInputLabel: "ShowerStartPosition"
+    InitialTrackSpacePointsInputLabel: "InitialTrackSpacePoints"
+    ShowerDirectionOutputLabel: "ShowerDirection"
+}
+
+showerstartpositioncheater:{
+    tool_type:               ShowerStartPositionCheater
+    BaseTools:           @local::showerbasetools
+    LArPandoraShowerCheatingAlg:    @local::standard_larpandorashowercheatingalg
+    # PFParticleLabel:  "pandora"
+    HitModuleLabel:         "linecluster"
+    ShowerStartPositionOutputLabel: "ShowerStartPosition"
+    TrueParticleOutputLabel: "TrueParticle"
+}
+
+showerdirectioncheater:{
+    tool_type:              ShowerDirectionCheater
+    BaseTools:          @local::showerbasetools
+    LArPandoraShowerCheatingAlg:   @local::standard_larpandorashowercheatingalg
+    # PFParticleLabel:  "pandora"
+    NSegments:              6     #Number of segements the shower should be split into
+    #for the RMS analysis
+    RMSFlip:                false #Decide to flip the direction on the RMS info
+    VertexFlip:             false #Decide to flip the direction based on the vertex
+    #position relative shower center.
+    ShowerStartPositionInputLabel: "ShowerStartPosition"
+    TrueParticleInputLabel:        "TrueParticle"
+    ShowerDirectionOutputLabel:     "ShowerDirection"
+}
+
+showertrackfindercheater:{
+    tool_type:               ShowerTrackFinderCheater
+    BaseTools:           @local::showerbasetools
+    LArPandoraShowerCheatingAlg:    @local::standard_larpandorashowercheatingalg
+    # PFParticleLabel:  "pandora"
+    HitModuleLabel:         "linecluster"
+    MaxProjectionDist:      10
+    MaxPerpendicularDist:   1
+    DebugEVD:               false
+    TrueParticleIntputLabel:     "TrueParticle"
+    ShowerStartPositionInputTag: "ShowerStartPosition"
+    ShowerDirectionInputTag:     "ShowerDirection"
+    InitialTrackHitsOutputLabel: "InitialTrackHits"
+    InitialTrackSpacePointsOutputLabel: "InitialTrackSpacePoints"
+}
+
+showertracktrajtospacepoint:{
+    tool_type: ShowerTrackTrajToSpacePoint
+    BaseTools: @local::showerbasetools
+    # PFParticleLabel: "pandora"
+    MaxDist:               1  #Max Distance a trajectory point can be away
+    #from a spacepoint in cm.
+    InitialTrackSpacePointsOutputLabel: "InitialTrackSpacePoints"
+    InitialTrackHitsOutputLabel: "InitialTrackHits"
+    InitialTrackInputTag: "InitialTrack"
+    ShowerStartPositionInputTag: "ShowerStartPosition"
+    InitialTrackSpacePointsInputTag: "InitialTrackSpacePoints"
+}
+
+showertrajpointdedx:{
+    tool_type: ShowerTrajPointdEdx
+    BaseTools: @local::showerbasetools
+    CalorimetryAlg: @nil
+    MinDistCutOff:         2    #Distance in wires a hit has to be from the start
+    #position of the track to be used
+    MaxDist:               2    #Distance in wires a that a trajectory point can
+    #be from a spacepoint to match to it.
+    MinAngleToWire:        0    #Minimum angle between the wire direction and the shower
+    #direction for the spacepoint to be used. in radians
+    #Default means the cut has no effect.
+    ShapingTime:           999  #Defualt means the cut has no effect. in microseconds.
+    dEdxTrackLength:       3  #Max Distance a spacepoint can be away
+    #from the start of the track. in seconds
+    dEdxCut:               999.
+    CutStartPosition:     false #Remove hits using MinDistCutOff from the vertex as well
+    UseMedian:            true  #Use the median dEdx rather the mean.
+    # PFParticleLabel: "pandora"
+    ShowerStartPositionInputLabel: "ShowerStartPosition"
+    InitialTrackSpacePointsInputLabel: "InitialTrackSpacePoints"
+    InitialTrackInputLabel: "InitialTrack"
+    ShowerdEdxOutputLabel: "ShowerdEdx"
+    ShowerBestPlaneOutputLabel: "ShowerBestPlane"
+    ShowerdEdxVecOutputLabel: "ShowerdEdxVec"
+}
+
+showerincrementaltrackhitfinder:{
+    tool_type: ShowerIncrementalTrackHitFinder
+    BaseTools: @local::showerbasetools
+    # PFParticleLabel: "pandora"
+    UseShowerDirection:    true
+    ForwardHitsOnly:       true
+    MaxResidualDiff:       0.3
+    MaxAverageResidual:    0.5
+    TrackMaxAdjacentSPDistance: 3.8160404930371678
+    StartFitSize:          12
+    NMissPoints:           10
+    ChargeWeighted:        false
+    MakeTrackSeed:         true
+    StartDistanceCut:      0
+    DistanceCut:           999
+    ShowerStartPositionInputLabel: "ShowerStartPosition"
+    InitialTrackHitsOutputLabel: "InitialTrackHits"
+    InitialTrackSpacePointsOutputLabel: "InitialTrackSpacePoints"
+    ShowerDirectionInputLabel: "ShowerDirection"
+}
+
+showerpcapropergationstartposition:{
+    tool_type: ShowerPCAPropergationStartPosition
+    BaseTools: @local::showerbasetools
+    # PFParticleLabel: "pandora"
+    ShowerStartPositionOutputLabel: "ShowerStartPosition"
+    ShowerCentreInputLabel: "ShowerCentre"
+    ShowerDirectionInputLabel: "ShowerDirection"
+    ShowerStartPositionInputLabel: "ShowerStartPosition"
+}
+
+showerbayesiantrucatingdedx:{
+    tool_type:  ShowerBayesianTrucatingdEdx
+    BaseTools: @local::showerbasetools
+    dEdxInputLabel: "ShowerdEdxVec"
+    NumSeedHits: 3
+    ProbSeedCut: 0.01
+    ProbPointCut: 0.01
+    PostiorCut: 0.01
+    nSkipHits: 2
+    ShowerdEdxOutputLabel: "ShowerdEdx"
+    PriorFname: "dEdx_plots.root"
+    PriorElectronHistoName: "electron_dedx"
+    PriorPhotonHistoName: "photon_dedx"
+    DefineBestPlane: false
+    ShowerBestPlaneOutputLabel: "ShowerBestPlane"
+}
+
+showerlengthpercentile:{
+    tool_type:  ShowerLengthPercentile
+    BaseTools: @local::showerbasetools
+    Percentile: 0.9
+    # PFParticleLabel: "pandora"
+    ShowerStartPositionInputLabel: "ShowerStartPosition"
+    ShowerDirectionInputLabel: "ShowerDirection"
+    ShowerLengthOutputLabel: "ShowerLength"
+    ShowerOpeningAngleOutputLabel: "ShowerOpeningAngle"
+}
+
+showerpcaeigenvaluelength:{
+    tool_type: ShowerPCAEigenvalueLength
+    BaseTools: @local::showerbasetools
+
+    # PFParticleLabel: "pandora"
+    ShowerPCAInputLabel: "ShowerPCA"
+    ShowerLengthOutputLabel: "ShowerLength"
+    ShowerOpeningAngleOutputLabel: "ShowerOpeningAngle"
+    NSigma: 3
+}
+
+
+showerdirectiontopologydecision:{
+    tool_type: ShowerDirectionTopologyDecision
+    BaseTools: @local::showerbasetools
+    AngleCut: 0.17
+    FirstDirectionInputLabel: "ShowerDirectionFirst"
+    SecondDirectionInputLabel: "ShowerDirectionSecond"
+    ShowerDirectionOutputLabel:   "ShowerDirection"
+}
+
+END_PROLOG

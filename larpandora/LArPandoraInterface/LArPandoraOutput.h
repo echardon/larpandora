@@ -20,66 +20,77 @@
 
 #include "Pandora/PandoraInternal.h"
 
-namespace art {class EDProducer;}
-namespace pandora {class Pandora;}
+namespace pandora {
+  class Pandora;
+}
+namespace util {
+  class GeometryUtilities;
+}
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-namespace lar_pandora
-{
+namespace lar_pandora {
 
-class LArPandoraOutput
-{
-public:
+  class LArPandoraOutput {
+  public:
     typedef std::vector<size_t> IdVector;
     typedef std::map<size_t, IdVector> IdToIdVectorMap;
-    typedef std::map<const pandora::CaloHit *, art::Ptr<recob::Hit> > CaloHitToArtHitMap;
+    typedef std::map<const pandora::CaloHit*, art::Ptr<recob::Hit>> CaloHitToArtHitMap;
 
-    typedef std::unique_ptr< std::vector<recob::PFParticle> > PFParticleCollection;
-    typedef std::unique_ptr< std::vector<recob::Vertex> > VertexCollection;
-    typedef std::unique_ptr< std::vector<recob::Cluster> > ClusterCollection;
-    typedef std::unique_ptr< std::vector<recob::SpacePoint> > SpacePointCollection;
-    typedef std::unique_ptr< std::vector<anab::T0> > T0Collection;
-    typedef std::unique_ptr< std::vector<larpandoraobj::PFParticleMetadata> > PFParticleMetadataCollection;
-    typedef std::unique_ptr< std::vector<recob::Slice> > SliceCollection;
+    typedef std::unique_ptr<std::vector<recob::PFParticle>> PFParticleCollection;
+    typedef std::unique_ptr<std::vector<recob::Vertex>> VertexCollection;
+    typedef std::unique_ptr<std::vector<recob::Cluster>> ClusterCollection;
+    typedef std::unique_ptr<std::vector<recob::SpacePoint>> SpacePointCollection;
+    typedef std::unique_ptr<std::vector<anab::T0>> T0Collection;
+    typedef std::unique_ptr<std::vector<larpandoraobj::PFParticleMetadata>>
+      PFParticleMetadataCollection;
+    typedef std::unique_ptr<std::vector<recob::Slice>> SliceCollection;
 
-    typedef std::unique_ptr< art::Assns<recob::PFParticle, larpandoraobj::PFParticleMetadata> > PFParticleToMetadataCollection;
-    typedef std::unique_ptr< art::Assns<recob::PFParticle, recob::SpacePoint> > PFParticleToSpacePointCollection;
-    typedef std::unique_ptr< art::Assns<recob::PFParticle, recob::Cluster> > PFParticleToClusterCollection;
-    typedef std::unique_ptr< art::Assns<recob::PFParticle, recob::Vertex> > PFParticleToVertexCollection;
-    typedef std::unique_ptr< art::Assns<recob::PFParticle, anab::T0> > PFParticleToT0Collection;
-    typedef std::unique_ptr< art::Assns<recob::PFParticle, recob::Slice> > PFParticleToSliceCollection;
+    typedef std::unique_ptr<art::Assns<recob::PFParticle, larpandoraobj::PFParticleMetadata>>
+      PFParticleToMetadataCollection;
+    typedef std::unique_ptr<art::Assns<recob::PFParticle, recob::SpacePoint>>
+      PFParticleToSpacePointCollection;
+    typedef std::unique_ptr<art::Assns<recob::PFParticle, recob::Cluster>>
+      PFParticleToClusterCollection;
+    typedef std::unique_ptr<art::Assns<recob::PFParticle, recob::Vertex>>
+      PFParticleToVertexCollection;
+    typedef std::unique_ptr<art::Assns<recob::PFParticle, anab::T0>> PFParticleToT0Collection;
+    typedef std::unique_ptr<art::Assns<recob::PFParticle, recob::Slice>>
+      PFParticleToSliceCollection;
 
-    typedef std::unique_ptr< art::Assns<recob::Cluster, recob::Hit> > ClusterToHitCollection;
-    typedef std::unique_ptr< art::Assns<recob::SpacePoint, recob::Hit> > SpacePointToHitCollection;
-    typedef std::unique_ptr< art::Assns<recob::Slice, recob::Hit> > SliceToHitCollection;
+    typedef std::unique_ptr<art::Assns<recob::Cluster, recob::Hit>> ClusterToHitCollection;
+    typedef std::unique_ptr<art::Assns<recob::SpacePoint, recob::Hit>> SpacePointToHitCollection;
+    typedef std::unique_ptr<art::Assns<recob::Slice, recob::Hit>> SliceToHitCollection;
 
     /**
      *  @brief  Settings class
      */
-    class Settings
-    {
+    class Settings {
     public:
-        /**
+      /**
          *  @brief  Default constructor
          */
-        Settings();
+      Settings();
 
-        /**
+      /**
          *  @brief  Check the parameters and throw an exception if they are not valid
          */
-        void Validate() const;
+      void Validate() const;
 
-        const pandora::Pandora *m_pPrimaryPandora;                           ///<
-        art::EDProducer        *m_pProducer;                                 ///<
-        bool                    m_shouldRunStitching;                        ///<
-        bool                    m_shouldProduceSlices;                       ///< Whether to produce output slices e.g. may not want to do this if only (re)processing single slices
-        bool                    m_shouldProduceAllOutcomes;                  ///< If all outcomes should be produced in separate collections (choose false if you only require the consolidated output)
-        std::string             m_allOutcomesInstanceLabel;                  ///< The label for the instance producing all outcomes
-        bool                    m_shouldProduceTestBeamInteractionVertices;  ///< Whether to write the test beam interaction vertices in a separate collection
-        std::string             m_testBeamInteractionVerticesInstanceLabel;  ///< The label for the test beam interaction vertices
-        bool                    m_isNeutrinoRecoOnlyNoSlicing;               ///< If we are running the neutrino reconstruction only with no slicing
-        std::string             m_hitfinderModuleLabel;                      ///< The hit finder module label
+      const pandora::Pandora* m_pPrimaryPandora; ///<
+      bool m_shouldRunStitching;                 ///<
+      bool
+        m_shouldProduceSlices; ///< Whether to produce output slices e.g. may not want to do this if only (re)processing single slices
+      bool
+        m_shouldProduceAllOutcomes; ///< If all outcomes should be produced in separate collections (choose false if you only require the consolidated output)
+      std::string m_allOutcomesInstanceLabel; ///< The label for the instance producing all outcomes
+      bool
+        m_shouldProduceTestBeamInteractionVertices; ///< Whether to write the test beam interaction vertices in a separate collection
+      std::string
+        m_testBeamInteractionVerticesInstanceLabel; ///< The label for the test beam interaction vertices
+      bool
+        m_isNeutrinoRecoOnlyNoSlicing; ///< If we are running the neutrino reconstruction only with no slicing
+      std::string m_hitfinderModuleLabel; ///< The hit finder module label
     };
 
     /**
@@ -89,7 +100,9 @@ public:
      *  @param  idToHitMap the mapping from Pandora hit ID to ART hit
      *  @param  evt the ART event
      */
-    static void ProduceArtOutput(const Settings &settings, const IdToHitMap &idToHitMap, art::Event &evt);
+    static void ProduceArtOutput(const Settings& settings,
+                                 const IdToHitMap& idToHitMap,
+                                 art::Event& evt);
 
     /**
      *  @brief  Get the address of a pandora instance with a given name
@@ -100,8 +113,9 @@ public:
      *
      *  @return if the pandora instance could be found
      */
-    static bool GetPandoraInstance(const pandora::Pandora *const pPrimaryPandora, const std::string &name,
-        const pandora::Pandora *&pPandoraInstance);
+    static bool GetPandoraInstance(const pandora::Pandora* const pPrimaryPandora,
+                                   const std::string& name,
+                                   const pandora::Pandora*& pPandoraInstance);
 
     /**
      *  @brief  Get the slice pfos - one pfo per slice
@@ -109,7 +123,8 @@ public:
      *  @param  pPrimaryPandora the primary pandora instance
      *  @param  slicePfos the output vector of slice pfos
      */
-    static void GetPandoraSlices(const pandora::Pandora *const pPrimaryPandora, pandora::PfoVector &slicePfos);
+    static void GetPandoraSlices(const pandora::Pandora* const pPrimaryPandora,
+                                 pandora::PfoVector& slicePfos);
 
     /**
      *  @brief  Check if the input pfo is an unambiguous cosmic ray
@@ -118,7 +133,7 @@ public:
      *
      *  @return if the input pfo is a clear cosmic ray
      */
-    static bool IsClearCosmic(const pandora::ParticleFlowObject *const pPfo);
+    static bool IsClearCosmic(const pandora::ParticleFlowObject* const pPfo);
 
     /**
      *  @brief  Check if the input pfo is from a slice
@@ -127,7 +142,7 @@ public:
      *
      *  @return if the input pfo is from a slice
      */
-    static bool IsFromSlice(const pandora::ParticleFlowObject *const pPfo);
+    static bool IsFromSlice(const pandora::ParticleFlowObject* const pPfo);
 
     /**
      *  @brief  Get the index of the slice from which this pfo was produced
@@ -136,7 +151,7 @@ public:
      *
      *  @return the slice index
      */
-    static unsigned int GetSliceIndex(const pandora::ParticleFlowObject *const pPfo);
+    static unsigned int GetSliceIndex(const pandora::ParticleFlowObject* const pPfo);
 
     /**
      *  @brief  Collect the current pfos (including all downstream pfos) from the master pandora instance
@@ -145,7 +160,7 @@ public:
      *
      *  @return a sorted list of all pfos to convert to ART PFParticles
      */
-    static pandora::PfoVector CollectPfos(const pandora::Pandora *const pPrimaryPandora);
+    static pandora::PfoVector CollectPfos(const pandora::Pandora* const pPrimaryPandora);
 
     /**
      *  @brief  Collect the pfos (including all downstream pfos) from the master and daughter pandora instances
@@ -154,7 +169,7 @@ public:
      *
      *  @return a sorted list of all pfos to convert to ART PFParticles
      */
-    static pandora::PfoVector CollectAllPfoOutcomes(const pandora::Pandora *const pPrimaryPandora);
+    static pandora::PfoVector CollectAllPfoOutcomes(const pandora::Pandora* const pPrimaryPandora);
 
     /**
      *  @brief  Collect a sorted list of all downstream pfos of an input list of parent
@@ -162,7 +177,7 @@ public:
      *  @param  parentPfoList the input list of parent pfos
      *  @param  pfoVector the sorted output list of all downstream pfos
      */
-    static void CollectPfos(const pandora::PfoList &parentPfoList, pandora::PfoVector &pfoVector);
+    static void CollectPfos(const pandora::PfoList& parentPfoList, pandora::PfoVector& pfoVector);
 
     /**
      *  @brief  Collect all vertices contained in the input pfo list
@@ -174,7 +189,11 @@ public:
      *
      *  @return the list of vertices collected
      */
-    static pandora::VertexVector CollectVertices(const pandora::PfoVector &pfoVector, IdToIdVectorMap &pfoToVerticesMap, std::function<const pandora::Vertex *const(const pandora::ParticleFlowObject *const)> fCriteria);
+    static pandora::VertexVector CollectVertices(
+      const pandora::PfoVector& pfoVector,
+      IdToIdVectorMap& pfoToVerticesMap,
+      std::function<const pandora::Vertex* const(const pandora::ParticleFlowObject* const)>
+        fCriteria);
 
     /**
      *  @brief  Collect a sorted list of all 2D clusters contained in the input pfo list
@@ -185,7 +204,8 @@ public:
      *
      *  @return the list of clusters collected
      */
-    static pandora::ClusterList CollectClusters(const pandora::PfoVector &pfoVector, IdToIdVectorMap &pfoToClustersMap);
+    static pandora::ClusterList CollectClusters(const pandora::PfoVector& pfoVector,
+                                                IdToIdVectorMap& pfoToClustersMap);
 
     /**
      *  @brief  Collect a sorted vector of all 3D hits in the input pfo
@@ -193,7 +213,8 @@ public:
      *  @param  pPfo the input pfo
      *  @param  caloHits the sorted output vector of 3D hits
      */
-    static void Collect3DHits(const pandora::ParticleFlowObject *const pPfo, pandora::CaloHitVector &caloHits);
+    static void Collect3DHits(const pandora::ParticleFlowObject* const pPfo,
+                              pandora::CaloHitVector& caloHits);
 
     /**
      *  @brief  Collect a sorted list of all 3D hits contained in the input pfo list
@@ -204,7 +225,8 @@ public:
      *
      *  @return the list of 3D hits collected
      */
-    static pandora::CaloHitList Collect3DHits(const pandora::PfoVector &pfoVector, IdToIdVectorMap &pfoToThreeDHitsMap);
+    static pandora::CaloHitList Collect3DHits(const pandora::PfoVector& pfoVector,
+                                              IdToIdVectorMap& pfoToThreeDHitsMap);
 
     /**
      *  @brief  Find the index of an input object in an input list. Throw an exception if it doesn't exist
@@ -215,7 +237,7 @@ public:
      *  @return the ID of the input object
      */
     template <typename T>
-    static size_t GetId(const T *const pT, const std::list<const T*> &tList);
+    static size_t GetId(const T* const pT, const std::list<const T*>& tList);
 
     /**
      *  @brief  Find the index of an input object in an input vector. Throw an exception if it doesn't exist
@@ -226,7 +248,7 @@ public:
      *  @return the ID of the input object
      */
     template <typename T>
-    static size_t GetId(const T *const pT, const std::vector<const T*> &tVector);
+    static size_t GetId(const T* const pT, const std::vector<const T*>& tVector);
 
     /**
      *  @brief  Collect all 2D and 3D hits that were used / produced in the reconstruction and map them to their corresponding ART hit
@@ -236,8 +258,10 @@ public:
      *  @param  idToHitMap input mapping from pandora hit ID to ART hit
      *  @param  pandoraHitToArtHitMap output mapping from pandora hit to ART hit
      */
-    static void GetPandoraToArtHitMap(const pandora::ClusterList &clusterList, const pandora::CaloHitList &threeDHitList,
-        const IdToHitMap &idToHitMap, CaloHitToArtHitMap &pandoraHitToArtHitMap);
+    static void GetPandoraToArtHitMap(const pandora::ClusterList& clusterList,
+                                      const pandora::CaloHitList& threeDHitList,
+                                      const IdToHitMap& idToHitMap,
+                                      CaloHitToArtHitMap& pandoraHitToArtHitMap);
 
     /**
      *  @brief  Look up ART hit from an input Pandora hit
@@ -245,7 +269,8 @@ public:
      *  @param  idToHitMap the mapping between Pandora and ART hits
      *  @param  pCaloHit the input Pandora hit (2D)
      */
-    static art::Ptr<recob::Hit> GetHit(const IdToHitMap &idToHitMap, const pandora::CaloHit *const pCaloHit);
+    static art::Ptr<recob::Hit> GetHit(const IdToHitMap& idToHitMap,
+                                       const pandora::CaloHit* const pCaloHit);
 
     /**
      *  @brief  Convert pandora vertices to ART vertices and add them to the output vector
@@ -253,22 +278,25 @@ public:
      *  @param  vertexVector the input list of pandora vertices
      *  @param  outputVertices the output vector of ART vertices
      */
-    static void BuildVertices(const pandora::VertexVector &vertexVector, VertexCollection &outputVertices);
+    static void BuildVertices(const pandora::VertexVector& vertexVector,
+                              VertexCollection& outputVertices);
 
     /**
      *  @brief  Convert pandora 3D hits to ART spacepoints and add them to the output vector
      *          Create the associations between spacepoints and hits
      *
      *  @param  event the art event
-     *  @param  pProducer the address of the producer module
      *  @param  threeDHitList the input list of 3D hits to convert
      *  @param  pandoraHitToArtHitMap the input mapping from pandora hits to ART hits
      *  @param  outputSpacePoints the output vector of spacepoints
      *  @param  outputSpacePointsToHits the output associations between spacepoints and hits
      */
-    static void BuildSpacePoints(const art::Event &event, const art::EDProducer *const pProducer, const std::string &instanceLabel,
-        const pandora::CaloHitList &threeDHitList, const CaloHitToArtHitMap &pandoraHitToArtHitMap, SpacePointCollection &outputSpacePoints,
-        SpacePointToHitCollection &outputSpacePointsToHits);
+    static void BuildSpacePoints(const art::Event& event,
+                                 const std::string& instanceLabel,
+                                 const pandora::CaloHitList& threeDHitList,
+                                 const CaloHitToArtHitMap& pandoraHitToArtHitMap,
+                                 SpacePointCollection& outputSpacePoints,
+                                 SpacePointToHitCollection& outputSpacePointsToHits);
 
     /**
      *  @brief  Convert pandora 2D clusters to ART clusters and add them to the output vector
@@ -276,7 +304,6 @@ public:
      *          For multiple drift volumes, each pandora cluster can correspond to multiple ART clusters.
      *
      *  @param  event the art event
-     *  @param  pProducer the address of the producer module
      *  @param  clusterList the input list of 2D pandora clusters to convert
      *  @param  pandoraHitToArtHitMap the input mapping from pandora hits to ART hits
      *  @param  pfoToClustersMap the input mapping from pfo ID to cluster IDs
@@ -284,16 +311,20 @@ public:
      *  @param  outputClustersToHits the output associations between clusters and hits
      *  @param  pfoToArtClustersMap the output mapping from pfo ID to art cluster ID
      */
-    static void BuildClusters(const art::Event &event, const art::EDProducer *const pProducer, const std::string &instanceLabel,
-        const pandora::ClusterList &clusterList, const CaloHitToArtHitMap &pandoraHitToArtHitMap, const IdToIdVectorMap &pfoToClustersMap,
-        ClusterCollection &outputClusters, ClusterToHitCollection &outputClustersToHits, IdToIdVectorMap &pfoToArtClustersMap);
+    static void BuildClusters(const art::Event& event,
+                              const std::string& instanceLabel,
+                              const pandora::ClusterList& clusterList,
+                              const CaloHitToArtHitMap& pandoraHitToArtHitMap,
+                              const IdToIdVectorMap& pfoToClustersMap,
+                              ClusterCollection& outputClusters,
+                              ClusterToHitCollection& outputClustersToHits,
+                              IdToIdVectorMap& pfoToArtClustersMap);
 
     /**
      *  @brief  Convert between pfos and PFParticles and add them to the output vector
      *          Create the associations between PFParticle and vertices, spacepoints and clusters
      *
      *  @param  event the art event
-     *  @param  pProducer the address of the producer module
      *  @param  pfoVector the input list of pfos to convert
      *  @param  pfoToVerticesMap the input mapping from pfo ID to vertex IDs
      *  @param  pfoToThreeDHitsMap the input mapping from pfo ID to 3D hit IDs
@@ -303,37 +334,46 @@ public:
      *  @param  outputParticlesToSpacePoints the output associations between PFParticles and spacepoints
      *  @param  outputParticlesToClusters the output associations between PFParticles and clusters
      */
-    static void BuildPFParticles(const art::Event &event, const art::EDProducer *const pProducer, const std::string &instanceLabel,
-        const pandora::PfoVector &pfoVector, const IdToIdVectorMap &pfoToVerticesMap, const IdToIdVectorMap &pfoToThreeDHitsMap,
-        const IdToIdVectorMap &pfoToArtClustersMap, PFParticleCollection &outputParticles,
-        PFParticleToVertexCollection &outputParticlesToVertices, PFParticleToSpacePointCollection &outputParticlesToSpacePoints,
-        PFParticleToClusterCollection &outputParticlesToClusters);
+    static void BuildPFParticles(const art::Event& event,
+                                 const std::string& instanceLabel,
+                                 const pandora::PfoVector& pfoVector,
+                                 const IdToIdVectorMap& pfoToVerticesMap,
+                                 const IdToIdVectorMap& pfoToThreeDHitsMap,
+                                 const IdToIdVectorMap& pfoToArtClustersMap,
+                                 PFParticleCollection& outputParticles,
+                                 PFParticleToVertexCollection& outputParticlesToVertices,
+                                 PFParticleToSpacePointCollection& outputParticlesToSpacePoints,
+                                 PFParticleToClusterCollection& outputParticlesToClusters);
 
     /**
      *  @brief  Convert Create the associations between pre-existing PFParticle and additional vertices
      *
      *  @param  event the art event
-     *  @param  pProducer the address of the producer module
      *  @param  instanceLabel instance label
      *  @param  pfoVector the input list of pfos to convert
      *  @param  pfoToVerticesMap the input mapping from pfo ID to vertex IDs
      *  @param  outputParticlesToVertices the output associations between PFParticles and vertices
      */
-    static void AssociateAdditionalVertices(const art::Event &event, const art::EDProducer *const pProducer, const std::string &instanceLabel, const pandora::PfoVector &pfoVector,
-        const IdToIdVectorMap &pfoToVerticesMap, PFParticleToVertexCollection &outputParticlesToVertices);
+    static void AssociateAdditionalVertices(
+      const art::Event& event,
+      const std::string& instanceLabel,
+      const pandora::PfoVector& pfoVector,
+      const IdToIdVectorMap& pfoToVerticesMap,
+      PFParticleToVertexCollection& outputParticlesToVertices);
 
     /**
      *  @brief  Build metadata objects from a list of input pfos
      *
      *  @param  event the art event
-     *  @param  pProducer the address of the producer module
      *  @param  pfoVector the input list of pfos
      *  @param  outputParticleMetadata the output vector of PFParticleMetadata
      *  @param  outputParticlesToMetadata the output associations between PFParticles and metadata
      */
-    static void BuildParticleMetadata(const art::Event &event, const art::EDProducer *const pProducer, const std::string &instanceLabel,
-        const pandora::PfoVector &pfoVector, PFParticleMetadataCollection &outputParticleMetadata,
-        PFParticleToMetadataCollection &outputParticlesToMetadata);
+    static void BuildParticleMetadata(const art::Event& event,
+                                      const std::string& instanceLabel,
+                                      const pandora::PfoVector& pfoVector,
+                                      PFParticleMetadataCollection& outputParticleMetadata,
+                                      PFParticleToMetadataCollection& outputParticlesToMetadata);
 
     /**
      *  @brief  Build slices - collections of hits which each describe a single particle hierarchy
@@ -341,7 +381,6 @@ public:
      *  @param  settings the settings
      *  @param  pPrimaryPandora the primary pandora instance
      *  @param  event the art event
-     *  @param  pProducer the address of the pandora producer
      *  @param  instanceLabel the label for the collections to be produced
      *  @param  pfoVector the input vector of all pfos to be output
      *  @param  idToHitMap input mapping from pandora hit ID to ART hit
@@ -349,24 +388,28 @@ public:
      *  @param  outputParticlesToSlices the output association from particles to slices
      *  @param  outputSlicesToHits the output association from slices to hits
      */
-    static void BuildSlices(const Settings &settings, const pandora::Pandora *const pPrimaryPandora, const art::Event &event,
-    const art::EDProducer *const pProducer, const std::string &instanceLabel, const pandora::PfoVector &pfoVector,
-    const IdToHitMap &idToHitMap, SliceCollection &outputSlices, PFParticleToSliceCollection &outputParticlesToSlices,
-    SliceToHitCollection &outputSlicesToHits);
+    static void BuildSlices(const Settings& settings,
+                            const pandora::Pandora* const pPrimaryPandora,
+                            const art::Event& event,
+                            const std::string& instanceLabel,
+                            const pandora::PfoVector& pfoVector,
+                            const IdToHitMap& idToHitMap,
+                            SliceCollection& outputSlices,
+                            PFParticleToSliceCollection& outputParticlesToSlices,
+                            SliceToHitCollection& outputSlicesToHits);
 
     /**
      *  @brief  Build a new slice object with dummy information
      *
      *  @param  outputSlices the output collection of slices to populate
      */
-    static unsigned int BuildDummySlice(SliceCollection &outputSlices);
+    static unsigned int BuildDummySlice(SliceCollection& outputSlices);
 
     /**
      *  @brief  Ouput a single slice containing all of the input hits
      *
      *  @param  settings the settings
      *  @param  event the art event
-     *  @param  pProducer the address of the pandora producer
      *  @param  instanceLabel the label for the collections to be produced
      *  @param  pfoVector the input vector of all pfos to be output
      *  @param  idToHitMap input mapping from pandora hit ID to ART hit
@@ -374,38 +417,47 @@ public:
      *  @param  outputParticlesToSlices the output association from particles to slices
      *  @param  outputSlicesToHits the output association from slices to hits
      */
-    static void CopyAllHitsToSingleSlice(const Settings &settings, const art::Event &event, const art::EDProducer *const pProducer,
-    const std::string &instanceLabel, const pandora::PfoVector &pfoVector, const IdToHitMap &idToHitMap, SliceCollection &outputSlices,
-    PFParticleToSliceCollection &outputParticlesToSlices, SliceToHitCollection &outputSlicesToHits);
+    static void CopyAllHitsToSingleSlice(const Settings& settings,
+                                         const art::Event& event,
+                                         const std::string& instanceLabel,
+                                         const pandora::PfoVector& pfoVector,
+                                         const IdToHitMap& idToHitMap,
+                                         SliceCollection& outputSlices,
+                                         PFParticleToSliceCollection& outputParticlesToSlices,
+                                         SliceToHitCollection& outputSlicesToHits);
 
     /**
      *  @brief  Build a new slice object from a PFO, this can be a top-level parent in a hierarchy or a "slice PFO" from the slicing instance
      *
      *  @param  pParentPfo the parent pfo from which to build the slice
      *  @param  event the art event
-     *  @param  pProducer the address of the pandora producer
      *  @param  instanceLabel the label for the collections to be produced
      *  @param  idToHitMap input mapping from pandora hit ID to ART hit
      *  @param  outputSlices the output collection of slices to populate
      *  @param  outputSlicesToHits the output association from slices to hits
      */
-    static unsigned int BuildSlice(const pandora::ParticleFlowObject *const pParentPfo, const art::Event &event,
-    const art::EDProducer *const pProducer, const std::string &instanceLabel, const IdToHitMap &idToHitMap, SliceCollection &outputSlices,
-    SliceToHitCollection &outputSlicesToHits);
+    static unsigned int BuildSlice(const pandora::ParticleFlowObject* const pParentPfo,
+                                   const art::Event& event,
+                                   const std::string& instanceLabel,
+                                   const IdToHitMap& idToHitMap,
+                                   SliceCollection& outputSlices,
+                                   SliceToHitCollection& outputSlicesToHits);
 
     /**
      *  @brief  Calculate the T0 of each pfos and add them to the output vector
      *          Create the associations between PFParticle and T0s
      *
      *  @param  event the art event
-     *  @param  pProducer the address of the producer module
      *  @param  instanceLabel the label for the collections to be produced
      *  @param  pfoVector the input list of pfos
      *  @param  outputT0s the output vector of T0s
      *  @param  outputParticlesToT0s the output associations between PFParticles and T0s
      */
-    static void BuildT0s(const art::Event &event, const art::EDProducer *const pProducer, const std::string &instanceLabel,
-        const pandora::PfoVector &pfoVector, T0Collection &outputT0s, PFParticleToT0Collection &outputParticlesToT0s);
+    static void BuildT0s(const art::Event& event,
+                         const std::string& instanceLabel,
+                         const pandora::PfoVector& pfoVector,
+                         T0Collection& outputT0s,
+                         PFParticleToT0Collection& outputParticlesToT0s);
 
     /**
      *  @brief  Convert from a pandora vertex to an ART vertex
@@ -415,7 +467,7 @@ public:
      *
      *  @param  the ART vertex
      */
-    static recob::Vertex BuildVertex(const pandora::Vertex *const pVertex, const size_t vertexId);
+    static recob::Vertex BuildVertex(const pandora::Vertex* const pVertex, const size_t vertexId);
 
     /**
      *  @brief  Convert from a pandora 3D hit to an ART spacepoint
@@ -425,7 +477,8 @@ public:
      *
      *  @param  the ART spacepoint
      */
-    static recob::SpacePoint BuildSpacePoint(const pandora::CaloHit *const pCaloHit, const size_t spacePointId);
+    static recob::SpacePoint BuildSpacePoint(const pandora::CaloHit* const pCaloHit,
+                                             const size_t spacePointId);
 
     /**
      *  @brief  Collect a sorted list of all 2D hits in a cluster
@@ -433,7 +486,8 @@ public:
      *  @param  pCluster the input cluster
      *  @param  sortedHits the output vector of sorted 2D hits
      */
-    static void GetHitsInCluster(const pandora::Cluster *const pCluster, pandora::CaloHitVector &sortedHits);
+    static void GetHitsInCluster(const pandora::Cluster* const pCluster,
+                                 pandora::CaloHitVector& sortedHits);
 
     /**
      *  @brief  Convert from a pandora 2D cluster to a vector of ART clusters (produce multiple if the cluster is split over drift volumes)
@@ -447,9 +501,15 @@ public:
      *
      *  @param  the vector of ART clusters
      */
-    static std::vector<recob::Cluster> BuildClusters(const pandora::Cluster *const pCluster, const pandora::ClusterList &clusterList,
-        const CaloHitToArtHitMap &pandoraHitToArtHitMap, IdToIdVectorMap &pandoraClusterToArtClustersMap, std::vector<HitVector> &hitVectors,
-        size_t &nextId, cluster::ClusterParamsAlgBase &algo);
+    static std::vector<recob::Cluster> BuildClusters(
+      util::GeometryUtilities const& gser,
+      const pandora::Cluster* const pCluster,
+      const pandora::ClusterList& clusterList,
+      const CaloHitToArtHitMap& pandoraHitToArtHitMap,
+      IdToIdVectorMap& pandoraClusterToArtClustersMap,
+      std::vector<HitVector>& hitVectors,
+      size_t& nextId,
+      cluster::ClusterParamsAlgBase& algo);
 
     /**
      *  @brief  Build an ART cluster from an input vector of ART hits
@@ -464,8 +524,11 @@ public:
      *  If you don't know which algorithm to pick, StandardClusterParamsAlg is a good default.
      *  The hits that are isolated (that is, present in isolatedHits) are not fed to the cluster parameter algorithms.
      */
-    static recob::Cluster BuildCluster(const size_t id, const HitVector &hitVector, const HitList &isolatedHits,
-        cluster::ClusterParamsAlgBase &algo);
+    static recob::Cluster BuildCluster(util::GeometryUtilities const& gser,
+                                       const size_t id,
+                                       const HitVector& hitVector,
+                                       const HitList& isolatedHits,
+                                       cluster::ClusterParamsAlgBase& algo);
 
     /**
      *  @brief  Convert from a pfo to and ART PFParticle
@@ -476,11 +539,14 @@ public:
      *
      *  @param  the ART PFParticle
      */
-    static recob::PFParticle BuildPFParticle(const pandora::ParticleFlowObject *const pPfo, const size_t pfoId, const pandora::PfoVector &pfoVector);
+    static recob::PFParticle BuildPFParticle(const pandora::ParticleFlowObject* const pPfo,
+                                             const size_t pfoId,
+                                             const pandora::PfoVector& pfoVector);
 
     /**
      *  @brief  If required, build a T0 for the input pfo
      *
+     *  @param  event the ART event
      *  @param  pPfo the input pfo
      *  @param  pfoVector the input list of pfos
      *  @param  nextId the ID of the T0 - will be incremented if the t0 was produced
@@ -488,80 +554,99 @@ public:
      *
      *  @return if a T0 was produced (calculated from the stitching hit shift distance)
      */
-    static bool BuildT0(const pandora::ParticleFlowObject *const pPfo, const pandora::PfoVector &pfoVector, size_t &nextId, anab::T0 &t0);
+    static bool BuildT0(const art::Event& event,
+                        const pandora::ParticleFlowObject* const pPfo,
+                        const pandora::PfoVector& pfoVector,
+                        size_t& nextId,
+                        anab::T0& t0);
 
     /**
      *  @brief  Add an association between objects with two given ids
      *
      *  @param  event the ART event
-     *  @param  pProducer the address of the producer module
      *  @param  idA the id of an object of type A
      *  @param  idB the id of an object of type B to associate to the first object
      *  @param  association the output association to update
      */
     template <typename A, typename B>
-    static void AddAssociation(const art::Event &event, const art::EDProducer *const pProducer, const std::string &instanceLabel,
-        const size_t idA, const size_t idB, std::unique_ptr< art::Assns<A, B> > &association);
+    static void AddAssociation(const art::Event& event,
+                               const std::string& instanceLabel,
+                               const size_t idA,
+                               const size_t idB,
+                               std::unique_ptr<art::Assns<A, B>>& association);
 
     /**
      *  @brief  Add associations between input objects
      *
      *  @param  event the ART event
-     *  @param  pProducer the address of the producer module
      *  @param  idA the id of an object of type A
      *  @param  aToBMap the input mapping from IDs of objects of type A to IDs of objects of type B to associate
      *  @param  association the output association to update
      */
     template <typename A, typename B>
-    static void AddAssociation(const art::Event &event, const art::EDProducer *const pProducer, const std::string &instanceLabel,
-        const size_t idA, const IdToIdVectorMap &aToBMap, std::unique_ptr< art::Assns<A, B> > &association);
+    static void AddAssociation(const art::Event& event,
+                               const std::string& instanceLabel,
+                               const size_t idA,
+                               const IdToIdVectorMap& aToBMap,
+                               std::unique_ptr<art::Assns<A, B>>& association);
 
     /**
      *  @brief  Add associations between input objects
      *
      *  @param  event the ART event
-     *  @param  pProducer the address of the producer module
      *  @param  idA the id of an object of type A
      *  @param  bVector the input vector of IDs of objects of type B to associate
      *  @param  association the output association to update
      */
     template <typename A, typename B>
-    static void AddAssociation(const art::Event &event, const art::EDProducer *const pProducer, const std::string &instanceLabel,
-        const size_t idA, const std::vector< art::Ptr<B> > &bVector, std::unique_ptr< art::Assns<A, B> > &association);
-};
+    static void AddAssociation(const art::Event& event,
+                               const std::string& instanceLabel,
+                               const size_t idA,
+                               const std::vector<art::Ptr<B>>& bVector,
+                               std::unique_ptr<art::Assns<A, B>>& association);
+  };
 
-//------------------------------------------------------------------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------------------------------------------------------------------
 
-template <typename T>
-inline size_t LArPandoraOutput::GetId(const T *const pT, const std::list<const T*> &tList)
-{
+  template <typename T>
+  inline size_t
+  LArPandoraOutput::GetId(const T* const pT, const std::list<const T*>& tList)
+  {
     typename std::list<const T*>::const_iterator it(std::find(tList.begin(), tList.end(), pT));
 
     if (it == tList.end())
-        throw cet::exception("LArPandora") << " LArPandoraOutput::GetId --- can't find the id of supplied object";
+      throw cet::exception("LArPandora")
+        << " LArPandoraOutput::GetId --- can't find the id of supplied object";
 
     return static_cast<size_t>(std::distance(tList.begin(), it));
-}
+  }
 
-//------------------------------------------------------------------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------------------------------------------------------------------
 
-template <typename T>
-inline size_t LArPandoraOutput::GetId(const T *const pT, const std::vector<const T*> &tVector)
-{
-    typename std::vector<const T*>::const_iterator it(std::find(tVector.begin(), tVector.end(), pT));
+  template <typename T>
+  inline size_t
+  LArPandoraOutput::GetId(const T* const pT, const std::vector<const T*>& tVector)
+  {
+    typename std::vector<const T*>::const_iterator it(
+      std::find(tVector.begin(), tVector.end(), pT));
 
     if (it == tVector.end())
-        throw cet::exception("LArPandora") << " LArPandoraOutput::GetId --- can't find the id of supplied object";
+      throw cet::exception("LArPandora")
+        << " LArPandoraOutput::GetId --- can't find the id of supplied object";
 
     return static_cast<size_t>(std::distance(tVector.begin(), it));
-}
+  }
 
-//------------------------------------------------------------------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------------------------------------------------------------------
 
-template <typename A, typename B>
-inline void LArPandoraOutput::AddAssociation(const art::Event &event, const art::EDProducer *const,
-    const std::string &instanceLabel, const size_t idA, const size_t idB, std::unique_ptr< art::Assns<A, B> > &association)
-{
+  template <typename A, typename B>
+  inline void
+  LArPandoraOutput::AddAssociation(const art::Event& event,
+                                   const std::string& instanceLabel,
+                                   const size_t idA,
+                                   const size_t idB,
+                                   std::unique_ptr<art::Assns<A, B>>& association)
+  {
     const art::PtrMaker<A> makePtrA(event, instanceLabel);
     art::Ptr<A> pA(makePtrA(idA));
 
@@ -569,42 +654,49 @@ inline void LArPandoraOutput::AddAssociation(const art::Event &event, const art:
     art::Ptr<B> pB(makePtrB(idB));
 
     association->addSingle(pA, pB);
-}
+  }
 
-//------------------------------------------------------------------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------------------------------------------------------------------
 
-template <typename A, typename B>
-inline void LArPandoraOutput::AddAssociation(const art::Event &event, const art::EDProducer *const,
-    const std::string &instanceLabel, const size_t idA, const IdToIdVectorMap &aToBMap, std::unique_ptr< art::Assns<A, B> > &association)
-{
+  template <typename A, typename B>
+  inline void
+  LArPandoraOutput::AddAssociation(const art::Event& event,
+                                   const std::string& instanceLabel,
+                                   const size_t idA,
+                                   const IdToIdVectorMap& aToBMap,
+                                   std::unique_ptr<art::Assns<A, B>>& association)
+  {
     IdToIdVectorMap::const_iterator it(aToBMap.find(idA));
     if (it == aToBMap.end())
-        throw cet::exception("LArPandora") << " LArPandoraOutput::AddAssociation --- id doesn't exists in the assocaition map";
+      throw cet::exception("LArPandora")
+        << " LArPandoraOutput::AddAssociation --- id doesn't exists in the assocaition map";
 
     const art::PtrMaker<A> makePtrA(event, instanceLabel);
     art::Ptr<A> pA(makePtrA(idA));
 
     const art::PtrMaker<B> makePtrB(event, instanceLabel);
-    for (const size_t idB : it->second)
-    {
-        art::Ptr<B> pB(makePtrB(idB));
-        association->addSingle(pA, pB);
+    for (const size_t idB : it->second) {
+      art::Ptr<B> pB(makePtrB(idB));
+      association->addSingle(pA, pB);
     }
-}
+  }
 
-//------------------------------------------------------------------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------------------------------------------------------------------
 
-template <typename A, typename B>
-inline void LArPandoraOutput::AddAssociation(const art::Event &event, const art::EDProducer *const,
-    const std::string &instanceLabel, const size_t idA, const std::vector< art::Ptr<B> > &bVector,
-    std::unique_ptr< art::Assns<A, B> > &association)
-{
+  template <typename A, typename B>
+  inline void
+  LArPandoraOutput::AddAssociation(const art::Event& event,
+                                   const std::string& instanceLabel,
+                                   const size_t idA,
+                                   const std::vector<art::Ptr<B>>& bVector,
+                                   std::unique_ptr<art::Assns<A, B>>& association)
+  {
     const art::PtrMaker<A> makePtrA(event, instanceLabel);
     art::Ptr<A> pA(makePtrA(idA));
 
-    for (const art::Ptr<B> &pB : bVector)
-        association->addSingle(pA, pB);
-}
+    for (const art::Ptr<B>& pB : bVector)
+      association->addSingle(pA, pB);
+  }
 
 } // namespace lar_pandora
 
