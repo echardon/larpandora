@@ -192,7 +192,7 @@ namespace lar_pandora {
     if (driftVolumeMap.end() == iter)
       throw cet::exception("LArPandora") << " LArPandoraGeometry::GetDaughterVolumeID --- found a TPC volume that doesn't belong to a drift volume";
 
-    for (LArDaughterDriftVolumeList::const_iterator iterDghtr = iter->second.GetTpcVolumeList().begin();
+    for (LArDaughterDriftVolumeList::const_iterator iterDghtr = iter->second.GetTpcVolumeList().begin(),
          iterDghtrEnd = iter->second.GetTpcVolumeList().end(); 
          iterDghtr != iterDghtrEnd; ++iterDghtr)
     {
