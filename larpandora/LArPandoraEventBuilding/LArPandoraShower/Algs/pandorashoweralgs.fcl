@@ -1,0 +1,22 @@
+BEGIN_PROLOG
+standard_larpandorashoweralg:
+{
+  UseCollectionOnly: false #Only use the collection charge infromation.
+  # PFParticleLabel: "pandora"
+  InitialTrackInputLabel: "InitialTrack"
+  ShowerStartPositionInputLabel: "ShowerStartPosition"
+  ShowerDirectionInputLabel: "ShowerDirection"
+  InitialTrackSpacePointsInputLabel: "InitialTrackSpacePoints"
+}
+
+standard_larpandorashowercheatingalg:
+{
+  LArPandoraShowerAlg:      @local::standard_larpandorashoweralg
+  HitModuleLabel:        "linecluster"
+  # PFParticleLabel: "pandora"
+  ShowerStartPositionInputLabel: "ShowerStartPosition"
+  ShowerDirectionInputLabel: "ShowerDirection"
+  InitialTrackSpacePointsInputLabel: "InitialTrackSpacePoints"
+}
+END_PROLOG
+

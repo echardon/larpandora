@@ -6,6 +6,7 @@ art_make(
                         larcore_Geometry_Geometry_service
                         larsim_Simulation lardataobj_Simulation
                         larsim_MCCheater_ParticleInventoryService_service
+                        lardataalg_DetectorInfo
                         lardataobj_RawData
                         lardataobj_RecoBase
                         lardataobj_AnalysisBase
@@ -30,7 +31,6 @@ art_make(
                         art_Utilities
                         canvas
                         ${MF_MESSAGELOGGER}
-
                         ${FHICLCPP}
                         cetlib cetlib_except
                         ROOT::Geom

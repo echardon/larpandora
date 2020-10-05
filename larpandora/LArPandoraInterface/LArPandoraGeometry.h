@@ -12,15 +12,13 @@
 #include <map>
 #include <vector>
 
-namespace lar_pandora
-{
+namespace lar_pandora {
 
-/**
+  /**
  *  @brief  drift volume class to hold properties of drift volume
  */
-class LArDetectorGap
-{
-public:
+  class LArDetectorGap {
+  public:
     /**
      *  @brief  Constructor
      *
@@ -31,7 +29,12 @@ public:
      *  @param  y2 upper Y coordinate
      *  @param  z2 upper Z coordinate
      */
-    LArDetectorGap(const float x1, const float y1, const float z1, const float x2, const float y2, const float z2);
+    LArDetectorGap(const float x1,
+                   const float y1,
+                   const float z1,
+                   const float x2,
+                   const float y2,
+                   const float z2);
 
     /**
      *  @brief Get lower X coordinate
@@ -68,27 +71,25 @@ public:
      */
     static float GetMaxGapSize() noexcept;
 
-private:
-    float   m_x1;
-    float   m_y1;
-    float   m_z1;
-    float   m_x2;
-    float   m_y2;
-    float   m_z2;
-    //float   m_maxGapSize; // unused - note that GetMaxGapSize returns a hard coded number
-};
+  private:
+    float m_x1;
+    float m_y1;
+    float m_z1;
+    float m_x2;
+    float m_y2;
+    float m_z2;
+  };
 
-typedef std::vector<LArDetectorGap> LArDetectorGapList;
+  typedef std::vector<LArDetectorGap> LArDetectorGapList;
 
-//------------------------------------------------------------------------------------------------------------------------------------------
-//------------------------------------------------------------------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------------------------------------------------------------------
 
-/**
+  /**
  *  @brief  daughter drift volume class to hold properties of daughter drift volumes
  */
-class LArDaughterDriftVolume
-{
-public:
+  class LArDaughterDriftVolume {
+  public:
     /**
      *  @brief  Constructor
      *
@@ -107,22 +108,21 @@ public:
      */
     unsigned int GetTpc() const;
 
-private:
-    unsigned int  m_cryostat;
-    unsigned int  m_tpc;
-};
+  private:
+    unsigned int m_cryostat;
+    unsigned int m_tpc;
+  };
 
-typedef std::vector<LArDaughterDriftVolume> LArDaughterDriftVolumeList;
+  typedef std::vector<LArDaughterDriftVolume> LArDaughterDriftVolumeList;
 
-//------------------------------------------------------------------------------------------------------------------------------------------
-//------------------------------------------------------------------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------------------------------------------------------------------
 
-/**
+  /**
  *  @brief  drift volume class to hold properties of drift volume
  */
-class LArDriftVolume
-{
-public:
+  class LArDriftVolume {
+  public:
     /**
      *  @brief  Constructor
      *
@@ -145,10 +145,22 @@ public:
      *  @param  sigmaUVZ         matching between views
      *  @param  tpcVolumeList    input list of TPC volumes
      */
-    LArDriftVolume(const unsigned int volumeID, const bool isPositiveDrift,
-        const float wirePitchU, const float wirePitchV, const float wirePitchW, const float wireAngleU, const float wireAngleV, const float wireAngleW,
-        const float centerX, const float centerY, const float centerZ, const float widthX, const float widthY, const float widthZ,
-        const float sigmaUVZ, const LArDaughterDriftVolumeList &tpcVolumeList);
+    LArDriftVolume(const unsigned int volumeID,
+                   const bool isPositiveDrift,
+                   const float wirePitchU,
+                   const float wirePitchV,
+                   const float wirePitchW,
+                   const float wireAngleU,
+                   const float wireAngleV,
+                   const float wireAngleW,
+                   const float centerX,
+                   const float centerY,
+                   const float centerZ,
+                   const float widthX,
+                   const float widthY,
+                   const float widthZ,
+                   const float sigmaUVZ,
+                   const LArDaughterDriftVolumeList& tpcVolumeList);
 
     /**
      *  @brief Return unique ID
@@ -228,46 +240,45 @@ public:
     /**
      *  @brief Return list of daughter drift volumes associated with this drift volume
      */
-    const LArDaughterDriftVolumeList &GetTpcVolumeList() const;
+    const LArDaughterDriftVolumeList& GetTpcVolumeList() const;
 
-private:
-    unsigned int    m_volumeID;
-    bool            m_isPositiveDrift;
-    float           m_wirePitchU;
-    float           m_wirePitchV;
-    float           m_wirePitchW;
-    float           m_wireAngleU;
-    float           m_wireAngleV;
-    float           m_wireAngleW;
-    float           m_centerX;
-    float           m_centerY;
-    float           m_centerZ;
-    float           m_widthX;
-    float           m_widthY;
-    float           m_widthZ;
-    float           m_sigmaUVZ;
+  private:
+    unsigned int m_volumeID;
+    bool m_isPositiveDrift;
+    float m_wirePitchU;
+    float m_wirePitchV;
+    float m_wirePitchW;
+    float m_wireAngleU;
+    float m_wireAngleV;
+    float m_wireAngleW;
+    float m_centerX;
+    float m_centerY;
+    float m_centerZ;
+    float m_widthX;
+    float m_widthY;
+    float m_widthZ;
+    float m_sigmaUVZ;
 
     LArDaughterDriftVolumeList m_tpcVolumeList;
-};
+  };
 
-typedef std::vector<LArDriftVolume> LArDriftVolumeList;
-typedef std::map<unsigned int, LArDriftVolume> LArDriftVolumeMap;
+  typedef std::vector<LArDriftVolume> LArDriftVolumeList;
+  typedef std::map<unsigned int, LArDriftVolume> LArDriftVolumeMap;
 
-//------------------------------------------------------------------------------------------------------------------------------------------
-//------------------------------------------------------------------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------------------------------------------------------------------
 
-/**
+  /**
  *  @brief  LArPandoraGeometry class
  */
-class LArPandoraGeometry
-{
-public:
+  class LArPandoraGeometry {
+  public:
     /**
      *  @brief Load the 2D gaps that go with the chosen geometry
      *
      *  @param listOfGaps the output list of 2D gaps.
      */
-    static void LoadDetectorGaps(LArDetectorGapList &listOfGaps);
+    static void LoadDetectorGaps(LArDetectorGapList& listOfGaps);
 
     /**
      *  @brief Load drift volume geometry
@@ -275,7 +286,8 @@ public:
      *  @param outputVolumeList the output list of drift volumes
      *  @param outputVolumeMap the output mapping between cryostat/tpc and drift volumes
      */
-    static void LoadGeometry(LArDriftVolumeList &outputVolumeList, LArDriftVolumeMap &outputVolumeMap);
+    static void LoadGeometry(LArDriftVolumeList& outputVolumeList,
+                             LArDriftVolumeMap& outputVolumeMap);
 
     /**
      *  @brief  Get drift volume ID from a specified cryostat/tpc pair
@@ -284,7 +296,9 @@ public:
      *  @param  cstat the input cryostat unique ID
      *  @param  tpc the input tpc unique ID
      */
-    static unsigned int GetVolumeID(const LArDriftVolumeMap &driftVolumeMap, const unsigned int cstat, const unsigned int tpc);
+    static unsigned int GetVolumeID(const LArDriftVolumeMap& driftVolumeMap,
+                                    const unsigned int cstat,
+                                    const unsigned int tpc);
 
     /**
      *  @brief  Convert to global coordinate system
@@ -293,9 +307,11 @@ public:
      *  @param  tpc the input tpc
      *  @param  hit_View the input view
      */
-    static geo::View_t GetGlobalView(const unsigned int cstat, const unsigned int tpc, const geo::View_t hit_View);
+    static geo::View_t GetGlobalView(const unsigned int cstat,
+                                     const unsigned int tpc,
+                                     const geo::View_t hit_View);
 
-private:
+  private:
     /**
      *  @brief  Generate a unique identifier for each TPC
      *
@@ -325,7 +341,7 @@ private:
      *
      *  @param  driftVolumeList to receive the populated drift volume list
      */
-    static void LoadGeometry(LArDriftVolumeList &driftVolumeList);
+    static void LoadGeometry(LArDriftVolumeList& driftVolumeList);
 
     /**
      *  @brief  This method will create one or more daughter volumes (these share a common drift orientation along the X-axis,
@@ -334,193 +350,222 @@ private:
      *  @param  driftVolumeList to receive the input drift volume list
      *  @param  parentVolumeList to receive the output daughter drift volume list
      */
-    static void LoadGlobalDaughterGeometry(const LArDriftVolumeList &driftVolumeList, LArDriftVolumeList &daughterVolumeList);
-};
+    static void LoadGlobalDaughterGeometry(const LArDriftVolumeList& driftVolumeList,
+                                           LArDriftVolumeList& daughterVolumeList);
+  };
 
-//------------------------------------------------------------------------------------------------------------------------------------------
-//------------------------------------------------------------------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline LArDetectorGap::LArDetectorGap(const float x1, const float y1, const float z1, const float x2, const float y2, const float z2) :
-    m_x1(x1), m_y1(y1), m_z1(z1), m_x2(x2), m_y2(y2), m_z2(z2)
-{
-}
+  inline LArDetectorGap::LArDetectorGap(const float x1,
+                                        const float y1,
+                                        const float z1,
+                                        const float x2,
+                                        const float y2,
+                                        const float z2)
+    : m_x1(x1), m_y1(y1), m_z1(z1), m_x2(x2), m_y2(y2), m_z2(z2)
+  {}
 
-//------------------------------------------------------------------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline float LArDetectorGap::GetX1() const
-{
+  inline float
+  LArDetectorGap::GetX1() const
+  {
     return m_x1;
-}
+  }
 
-//------------------------------------------------------------------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline float LArDetectorGap::GetY1() const
-{
+  inline float
+  LArDetectorGap::GetY1() const
+  {
     return m_y1;
-}
+  }
 
-//------------------------------------------------------------------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline float LArDetectorGap::GetZ1() const
-{
+  inline float
+  LArDetectorGap::GetZ1() const
+  {
     return m_z1;
-}
+  }
 
-//------------------------------------------------------------------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline float LArDetectorGap::GetX2() const
-{
+  inline float
+  LArDetectorGap::GetX2() const
+  {
     return m_x2;
-}
+  }
 
-//------------------------------------------------------------------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline float LArDetectorGap::GetY2() const
-{
+  inline float
+  LArDetectorGap::GetY2() const
+  {
     return m_y2;
-}
+  }
 
-//------------------------------------------------------------------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline float LArDetectorGap::GetZ2() const
-{
+  inline float
+  LArDetectorGap::GetZ2() const
+  {
     return m_z2;
-}
+  }
 
-//------------------------------------------------------------------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline float LArDetectorGap::GetMaxGapSize() noexcept
-{
+  inline float
+  LArDetectorGap::GetMaxGapSize() noexcept
+  {
     return 30.f; // TODO: 30cm should be fine but can we do better than a hard-coded number here?
-}
+  }
 
-//------------------------------------------------------------------------------------------------------------------------------------------
-//------------------------------------------------------------------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline LArDaughterDriftVolume::LArDaughterDriftVolume(const unsigned int cryostat, const unsigned int tpc) :
-    m_cryostat(cryostat), m_tpc(tpc)
-{
-}
+  inline LArDaughterDriftVolume::LArDaughterDriftVolume(const unsigned int cryostat,
+                                                        const unsigned int tpc)
+    : m_cryostat(cryostat), m_tpc(tpc)
+  {}
 
-//------------------------------------------------------------------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline unsigned int LArDaughterDriftVolume::GetCryostat() const
-{
+  inline unsigned int
+  LArDaughterDriftVolume::GetCryostat() const
+  {
     return m_cryostat;
-}
+  }
 
-//------------------------------------------------------------------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline unsigned int LArDaughterDriftVolume::GetTpc() const
-{
+  inline unsigned int
+  LArDaughterDriftVolume::GetTpc() const
+  {
     return m_tpc;
-}
+  }
 
-//------------------------------------------------------------------------------------------------------------------------------------------
-//------------------------------------------------------------------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline unsigned int LArDriftVolume::GetVolumeID() const
-{
+  inline unsigned int
+  LArDriftVolume::GetVolumeID() const
+  {
     return m_volumeID;
-}
+  }
 
-//------------------------------------------------------------------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline bool LArDriftVolume::IsPositiveDrift() const
-{
+  inline bool
+  LArDriftVolume::IsPositiveDrift() const
+  {
     return m_isPositiveDrift;
-}
+  }
 
-//------------------------------------------------------------------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline float LArDriftVolume::GetWirePitchU() const
-{
+  inline float
+  LArDriftVolume::GetWirePitchU() const
+  {
     return m_wirePitchU;
-}
+  }
 
-//------------------------------------------------------------------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline float LArDriftVolume::GetWirePitchV() const
-{
+  inline float
+  LArDriftVolume::GetWirePitchV() const
+  {
     return m_wirePitchV;
-}
+  }
 
-//------------------------------------------------------------------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline float LArDriftVolume::GetWirePitchW() const
-{
+  inline float
+  LArDriftVolume::GetWirePitchW() const
+  {
     return m_wirePitchW;
-}
+  }
 
-//------------------------------------------------------------------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline float LArDriftVolume::GetWireAngleU() const
-{
+  inline float
+  LArDriftVolume::GetWireAngleU() const
+  {
     return m_wireAngleU;
-}
+  }
 
-//------------------------------------------------------------------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline float LArDriftVolume::GetWireAngleV() const
-{
+  inline float
+  LArDriftVolume::GetWireAngleV() const
+  {
     return m_wireAngleV;
-}
+  }
 
-//------------------------------------------------------------------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline float LArDriftVolume::GetWireAngleW() const
-{
+  inline float
+  LArDriftVolume::GetWireAngleW() const
+  {
     return m_wireAngleW;
-}
+  }
 
-//------------------------------------------------------------------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline float LArDriftVolume::GetCenterX() const
-{
+  inline float
+  LArDriftVolume::GetCenterX() const
+  {
     return m_centerX;
-}
+  }
 
-//------------------------------------------------------------------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline float LArDriftVolume::GetCenterY() const
-{
+  inline float
+  LArDriftVolume::GetCenterY() const
+  {
     return m_centerY;
-}
+  }
 
-//------------------------------------------------------------------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline float LArDriftVolume::GetCenterZ() const
-{
+  inline float
+  LArDriftVolume::GetCenterZ() const
+  {
     return m_centerZ;
-}
+  }
 
-//------------------------------------------------------------------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline float LArDriftVolume::GetWidthX() const
-{
+  inline float
+  LArDriftVolume::GetWidthX() const
+  {
     return m_widthX;
-}
+  }
 
-//------------------------------------------------------------------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline float LArDriftVolume::GetWidthY() const
-{
+  inline float
+  LArDriftVolume::GetWidthY() const
+  {
     return m_widthY;
-}
+  }
 
-//------------------------------------------------------------------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline float LArDriftVolume::GetWidthZ() const
-{
+  inline float
+  LArDriftVolume::GetWidthZ() const
+  {
     return m_widthZ;
-}
+  }
 
-//------------------------------------------------------------------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline float LArDriftVolume::GetSigmaUVZ() const
-{
+  inline float
+  LArDriftVolume::GetSigmaUVZ() const
+  {
     return m_sigmaUVZ;
-}
+  }
 
 } // namespace lar_pandora
 
