@@ -102,7 +102,7 @@ namespace lar_pandora {
      *  @param  widthY           width of tpc volume (Y)
      *  @param  widthZ           width of tpc volume (Z)
      */
-    LArDaughterDriftVolume(const unsigned int cryostat, const unsigned int tpc
+    LArDaughterDriftVolume(const unsigned int cryostat, const unsigned int tpc,
                            const float centerX, const float centerY, const float centerZ,
                            const float widthX, const float widthY, const float widthZ);
 
