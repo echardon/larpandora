@@ -352,8 +352,8 @@ private:
      *  @param  tpc the input tpc unique ID
      */
     static unsigned int GetDaughterVolumeID(const LArDriftVolumeMap& driftVolumeMap,
-                                    const unsigned int cstat,
-                                    const unsigned int tpc);
+                                            const unsigned int cstat,
+                                            const unsigned int tpc);
 
     /**
      *  @brief  Convert to global coordinate system
